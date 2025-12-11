@@ -21,7 +21,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/vendas', vendaRouter);
 app.use('/estoque', estoqueRouter);
-app.use('/produtos', produtoRouter);
+app.use('/produto', produtoRouter);
 
 app.use(function(req, res, next) {
   next(createError(404));
