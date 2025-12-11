@@ -1,0 +1,1 @@
+const VendaMongo = require("../database/VendaMongo");

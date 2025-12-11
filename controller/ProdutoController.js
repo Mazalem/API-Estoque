@@ -1,0 +1,1 @@
+const ProdutoMongo = require("../database/ProdutoMongo");
