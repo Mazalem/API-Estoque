@@ -13,6 +13,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+app.use('/vendas', vendaRouter);
+app.use('/estoque', estoqueRouter);
+app.use('/produto', produtoRouter);
 // swagger
 swaggerDocs(app);
 
