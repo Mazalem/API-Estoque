@@ -3,6 +3,9 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const vendaRouter = require("./routes/VendaRouter");
+const estoqueRouter = require("./routes/EstoqueRouter");
+const produtoRouter = require("./routes/ProdutoRouter");
 
 const { swaggerDocs } = require("./config/swagger");
 
