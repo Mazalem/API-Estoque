@@ -7,7 +7,7 @@ var cliente;
 const conexao_bd = async () => {
     if (!cliente) {
         try {
-            cliente = await ClienteMongo.connect(process.env.URL_BANCO, { useNewUrlParser: true, useUnifiedTopology: true });
+            cliente = await ClienteMongo.connect("mongodb://127.0.0.1:27017", { useNewUrlParser: true, useUnifiedTopology: true });
             console.log('Conectado ao banco de dados!');
         } catch (err) {
             console.error('Erro ao conectar ao banco de dados:', err);
