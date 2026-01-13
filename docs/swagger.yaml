@@ -1,0 +1,396 @@
+openapi: 3.0.0
+
+info:
+  title: API de Estoque
+  version: 1.1.0
+  description: API para gerenciamento de estoque, produtos, categorias e vendas.
+
+servers:
+  - url: http://localhost:3000
+    description: Servidor local
+
+tags:
+  - name: Produtos
+  - name: Categorias
+  - name: Estoque
+  - name: Vendas
+
+paths:
+
+  /produtos:
+    get:
+      tags: [Produtos]
+      summary: Lista todos os produtos
+      responses:
+        '200':
+          description: Lista de produtos retornada
+          content:
+            application/json:
+              example:
+                - id: "693afda0f6437add7f9646p1"
+                  nome: "Arroz 5kg"
+                  idCategoria: "693afda0f6437add7f9646c1"
+                  preco: 24.90
+                  descricao: "Arroz tipo 1"
+                - id: "693afda0f6437add7f9646p2"
+                  nome: "Feijão Preto"
+                  idCategoria: "693afda0f6437add7f9646c1"
+                  preco: 8.50
+                  descricao: "Feijão selecionado"
+
+    post:
+      tags: [Produtos]
+      summary: Cadastra um novo produto
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Produto'
+            example:
+              nome: "Macarrão"
+              idCategoria: "693afda0f6437add7f9646c2"
+              preco: 4.50
+              descricao: "Macarrão espaguete"
+      responses:
+        '201':
+          description: Produto criado
+          content:
+            application/json:
+              example:
+                id: "693afda0f6437add7f9646p3"
+                nome: "Macarrão"
+                idCategoria: "693afda0f6437add7f9646c2"
+                preco: 4.50
+                descricao: "Macarrão espaguete"
+
+  /produtos/{id}:
+    get:
+      tags: [Produtos]
+      summary: Busca produto pelo ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Produto encontrado
+          content:
+            application/json:
+              example:
+                id: "693afda0f6437add7f9646p1"
+                nome: "Arroz 5kg"
+                idCategoria: "693afda0f6437add7f9646c1"
+                preco: 24.90
+                descricao: "Arroz tipo 1"
+        '404':
+          description: Produto não encontrado
+
+    put:
+      tags: [Produtos]
+      summary: Atualiza um produto
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Produto' }
+            example:
+              nome: "Arroz Premium 5kg"
+              idCategoria: "693afda0f6437add7f9646c1"
+              preco: 29.90
+              descricao: "Arroz melhorado"
+      responses:
+        '200':
+          description: Produto atualizado
+          content:
+            application/json:
+              example:
+                id: "693afda0f6437add7f9646p1"
+                nome: "Arroz Premium 5kg"
+                idCategoria: "693afda0f6437add7f9646c1"
+                preco: 29.90
+
+    delete:
+      tags: [Produtos]
+      summary: Remove produto
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Produto removido
+
+  /produtos/categoria/{idCategoria}:
+    get:
+      tags: [Produtos]
+      summary: Lista produtos por categoria
+      parameters:
+        - in: path
+          name: idCategoria
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista retornada
+          content:
+            application/json:
+              example:
+                - id: "693afda0f6437add7f9646p1"
+                  nome: "Arroz 5kg"
+                  idCategoria: "693afda0f6437add7f9646c1"
+                  preco: 24.90
+
+  /categorias:
+    get:
+      tags: [Categorias]
+      summary: Lista categorias
+      responses:
+        '200':
+          description: Categorias retornadas
+          content:
+            application/json:
+              example:
+                - id: "693afda0f6437add7f9646c1"
+                  nome: "Alimentos"
+                - id: "693afda0f6437add7f9646c2"
+                  nome: "Higiene"
+
+    post:
+      tags: [Categorias]
+      summary: Cria categoria
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Categoria' }
+            example:
+              nome: "Bebidas"
+      responses:
+        '201':
+          description: Categoria criada
+          content:
+            application/json:
+              example:
+                id: "693afda0f6437add7f9646c3"
+                nome: "Bebidas"
+
+  /categorias/{id}:
+    get:
+      tags: [Categorias]
+      summary: Busca categoria
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Categoria encontrada
+          content:
+            application/json:
+              example:
+                id: "693afda0f6437add7f9646c1"
+                nome: "Alimentos"
+
+    put:
+      tags: [Categorias]
+      summary: Atualiza categoria
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Categoria' }
+            example:
+              nome: "Alimentos Secos"
+      responses:
+        '200':
+          description: Categoria atualizada
+
+    delete:
+      tags: [Categorias]
+      summary: Remove categoria
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Categoria removida
+  /estoque:
+    get:
+      tags: [Estoque]
+      summary: Lista estoque de todos os produtos
+      responses:
+        '200':
+          description: Estoque retornado
+          content:
+            application/json:
+              example:
+                - idProduto: "693afda0f6437add7f9646p1"
+                  quantidade: 150
+                - idProduto: "693afda0f6437add7f9646p2"
+                  quantidade: 44
+
+  /estoque/{idProduto}:
+    get:
+      tags: [Estoque]
+      summary: Consulta estoque de um produto
+      parameters:
+        - in: path
+          name: idProduto
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Estoque encontrado
+          content:
+            application/json:
+              example:
+                idProduto: "693afda0f6437add7f9646p1"
+                quantidade: 150
+
+  /estoque/movimentar:
+    post:
+      tags: [Estoque]
+      summary: Movimenta estoque
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MovimentoEstoque' }
+            example:
+              idProduto: "693afda0f6437add7f9646p1"
+              tipo: "entrada"
+              quantidade: 20
+      responses:
+        '200':
+          description: Movimento registrado
+          content:
+            application/json:
+              example:
+                idProduto: "693afda0f6437add7f9646p1"
+                quantidade: 20
+                data: "2025-02-01"
+  /vendas:
+    get:
+      tags: [Vendas]
+      summary: Lista vendas realizadas
+      responses:
+        '200':
+          description: Lista de vendas
+          content:
+            application/json:
+              example:
+                - id: "693afda0f6437add7f9646v1"
+                  data: "2025-01-20"
+                  total: 120.50
+                  itens:
+                    - idProduto: "693afda0f6437add7f964612"
+                      quantidade: 2
+                      precoUnitario: 24.90
+
+    post:
+      tags: [Vendas]
+      summary: Registra nova venda
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/Venda' }
+            example:
+              itens:
+                - idProduto: "693afda0f6437add7f964613"
+                  quantidade: 2
+                - idProduto: "693afda0f6437add7f964617"
+                  quantidade: 1
+      responses:
+        '201':
+          description: Venda registrada
+          content:
+            application/json:
+              example:
+                id: "693afda0f6437add7f964610"
+                total: 58.30
+                data: "2025-02-01"
+
+  /vendas/{id}:
+    get:
+      tags: [Vendas]
+      summary: Busca venda pelo ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+      responses:
+        '200':
+          description: Venda retornada
+          content:
+            application/json:
+              example:
+                id: "v1"
+                total: 120.50
+                data: "2025-01-20"
+                itens:
+                  - idProduto: "693afda0f6437add7f964613"
+                    quantidade: 2
+                    precoUnitario: 24.90
+        '404':
+          description: Venda não encontrada
+components:
+  schemas:
+
+    Produto:
+      type: object
+      properties:
+        nome: { type: string }
+        idCategoria: { type: string }
+        preco: { type: number }
+        descricao: { type: string }
+      required: [nome, idCategoria]
+
+    Categoria:
+      type: object
+      properties:
+        nome: { type: string }
+      required: [nome]
+
+    MovimentoEstoque:
+      type: object
+      properties:
+        idProduto: { type: string }
+        quantidade: { type: integer }
+      required: [idProduto, quantidade]
+
+    Venda:
+      type: object
+      properties:
+        itens:
+          type: array
+          items:
+            type: object
+            properties:
+              idProduto: { type: string }
+              quantidade: { type: integer }
+      required: [itens]
