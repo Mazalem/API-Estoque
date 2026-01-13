@@ -2,7 +2,7 @@ require("dotenv").config();
 const mongodb = require("mongodb");
 
 const ClienteMongo = mongodb.MongoClient;
-var cliente;
+let cliente;
 
 const conexao_bd = async () => {
     if (!cliente)
@@ -14,6 +14,14 @@ const bd = () => {
 };
 
 class EstoqueMongo {
+    async connect() {
+        await conexao_bd();
+    }
+
+    getDB() {
+        return bd();
+    }
+
     async close() {
         if (cliente) cliente.close();
         cliente = undefined;

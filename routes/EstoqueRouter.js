@@ -1,6 +1,6 @@
-var express = require('express');
-var router = express.Router();
-var EstoqueController = require('../controller/EstoqueController');
+let express = require('express');
+let router = express.Router();
+let EstoqueController = require('../controller/EstoqueController');
 
 //router.get('/', EstoqueController.listarEstoques);
 
