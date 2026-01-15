@@ -1,4 +1,4 @@
-const Categoria = require("../../model/Categoria");
+const Categoria = require("../model/Categoria");
 
 const listar = async () => {
   return await Categoria.listar();
