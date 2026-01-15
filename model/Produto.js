@@ -1,27 +1,6 @@
 require("dotenv").config();
+const EstoqueMongo = require("../database/EstoqueMongo");
 const mongodb = require("mongodb");
-
-const ClienteMongo = mongodb.MongoClient;
-var cliente;
-
-const conexao_bd = async () => {
-    if (!cliente) {
-        try {
-            cliente = await ClienteMongo.connect("mongodb://127.0.0.1:27017", { useNewUrlParser: true, useUnifiedTopology: true });
-            console.log('Conectado ao banco de dados!');
-        } catch (err) {
-            console.error('Erro ao conectar ao banco de dados:', err);
-            throw new Error('Erro na conexão com o banco de dados');
-        }
-    }
-};
-
-const bd = () => {
-    if (!cliente) {
-        throw new Error('Cliente não está conectado ao banco de dados');
-    }
-    return cliente.db("api_estoque");
-};
 
 class Produto {
   constructor(nome, descricao, preco, _id) {
@@ -43,29 +22,29 @@ class Produto {
   setPreco(preco) { if (typeof preco !== 'number' || preco < 0) throw new Error('Preço inválido'); this.preco = preco; }
 
   static async listarProdutos() {
-    await conexao_bd();
-    return bd().collection('produtos').find({}).toArray();
+    await EstoqueMongo.connect();
+    return EstoqueMongo.getDB().collection('produtos').find({}).toArray();
   }
 
   static async criarProduto(produto) {
-    await conexao_bd();
-    const resultado = await bd().collection('produtos').insertOne(produto);
+    await EstoqueMongo.connect();
+    const resultado = await EstoqueMongo.getDB().collection('produtos').insertOne(produto);
     return resultado.ops[0];
   }
 
   static async obterProduto(id) {
-    await conexao_bd();
-    return bd().collection('produtos').findOne({ _id: mongodb.ObjectId(id) });
+    await EstoqueMongo.connect();
+    return EstoqueMongo.getDB().collection('produtos').findOne({ _id: mongodb.ObjectId(id) });
   }
 
   static async atualizarProduto(id, produto) {
-    await conexao_bd();
-    return bd().collection('produtos').updateOne({ _id: mongodb.ObjectId(id) }, { $set: produto });
+    await EstoqueMongo.connect();
+    return EstoqueMongo.getDB().collection('produtos').updateOne({ _id: mongodb.ObjectId(id) }, { $set: produto });
   }
 
   static async deletarProduto(id) {
-    await conexao_bd();
-    return bd().collection('produtos').deleteOne({ _id: mongodb.ObjectId(id) });
+    await EstoqueMongo.connect();
+    return EstoqueMongo.getDB().collection('produtos').deleteOne({ _id: mongodb.ObjectId(id) });
   }
 }
 

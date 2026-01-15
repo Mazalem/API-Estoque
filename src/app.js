@@ -4,11 +4,11 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
-const vendaRouter = require("../routes/VendaRouter");
-const estoqueRouter = require("../routes/EstoqueRouter");
+//const vendaRouter = require("../routes/VendaRouter");
+//const estoqueRouter = require("../routes/EstoqueRouter");
 const produtoRouter = require("../routes/ProdutoRouter");
 
-const categoriasRouter = require('./routes/categorias.routes');
+const categoriasRouter = require('../routes/CategoriasRoutes');
 
 const { swaggerDocs } = require("../config/swagger");
 
@@ -19,9 +19,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use('/vendas', vendaRouter);
-app.use('/estoque', estoqueRouter);
-app.use('/produto', produtoRouter);
+//app.use('/vendas', vendaRouter);
+//app.use('/estoque', estoqueRouter);
+app.use('/produtos', produtoRouter);
 app.use('/categorias', categoriasRouter);
 
 swaggerDocs(app);
