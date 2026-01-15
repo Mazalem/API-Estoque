@@ -13,7 +13,7 @@ const bd = () => {
     return cliente.db("api_estoque");
 };
 
-class EstoqueMongo {
+class DbMongo {
     async connect() {
         await conexao_bd();
     }
@@ -28,4 +28,4 @@ class EstoqueMongo {
     }
 
 }
-module.exports = new EstoqueMongo();
+module.exports = new DbMongo();
