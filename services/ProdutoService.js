@@ -1,35 +1,65 @@
 const Produto = require("../model/Produto");
 
 exports.listarProdutos = async () => {
-    return await Produto.listarProdutos();
+    try {
+        return await Produto.listarProdutos();
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
 };
 
 exports.criarProduto = async (nome, id_categoria, preco, descricao) => {
-    const produto = new Produto(nome, id_categoria, preco, descricao);
-    return await Produto.criarProduto(produto);
+    try {
+        const produto = new Produto(nome, id_categoria, preco, descricao);
+        return await Produto.criarProduto(produto);
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
 };
 
 exports.obterProduto = async (id) => {
-    return await Produto.obterProduto(id);
+    try {
+        return await Produto.obterProduto(id);
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
 };
 
 exports.atualizarProduto = async (id, produto) => {
-    const produtoExiste = await this.obterProduto(id);
-    if (!produtoExiste) {
-        return null;
+    try {
+        const produtoExiste = await this.obterProduto(id);
+        if (!produtoExiste) {
+            return null;
+        }
+        const produtoAtualizado = new Produto(produto.nome, produto.id_categoria, produto.preco, produto.descricao);
+        return await Produto.atualizarProduto(id, produtoAtualizado);
+    } catch (error) {
+        console.log(error);
+        throw error;
     }
-    const produtoAtualizado = new Produto(produto.nome, produto.id_categoria, produto.preco, produto.descricao);
-    return await Produto.atualizarProduto(id, produtoAtualizado);
 };
 
 exports.deletarProduto = async (id) => {
-    const produtoExiste = await this.obterProduto(id);
-    if (!produtoExiste) {
-        return null;
+    try {
+        const produtoExiste = await this.obterProduto(id);
+        if (!produtoExiste) {
+            return null;
+        }
+        return await Produto.deletarProduto(id);
+    } catch (error) {
+        console.log(error);
+        throw error;
     }
-    return await Produto.deletarProduto(id);
 };
 
 exports.obterProdutosPorCategoria = async (id_categoria) => {
-    return await Produto.obterProdutosPorCategoria(id_categoria);
+    try {
+        return await Produto.obterProdutosPorCategoria(id_categoria);
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
 };
