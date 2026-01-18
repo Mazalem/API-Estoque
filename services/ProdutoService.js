@@ -1,4 +1,5 @@
 const Produto = require("../model/Produto");
+const EstoqueService = require("./EstoqueService");
 
 exports.listarProdutos = async () => {
     try {
@@ -12,7 +13,9 @@ exports.listarProdutos = async () => {
 exports.criarProduto = async (nome, id_categoria, preco, descricao) => {
     try {
         const produto = new Produto(nome, id_categoria, preco, descricao);
-        return await Produto.criarProduto(produto);
+        produto = await Produto.criarProduto(produto);
+        await EstoqueService.criarEstoque(produto._id);
+        return produto;
     } catch (error) {
         console.log(error);
         throw error;
