@@ -13,19 +13,24 @@ exports.criarProduto = async (req, res) => {
     try {
         const { nome, id_categoria, preco, descricao } = req.body;
         if (!nome || !id_categoria || !preco || !descricao) {
-            return res.status(400).json({ message: "Todos os campos devem ser preenchidos" });
+            res.status(400).json({ message: "Todos os campos devem ser preenchidos" });
+            return;
         }
         if (typeof nome !== "string") {
-            return res.status(400).json({ message: "Nome deve ser uma string" });
+            res.status(400).json({ message: "Nome deve ser uma string" });
+            return;
         }
         if (typeof id_categoria !== "string") {
-            return res.status(400).json({ message: "ID da categoria deve ser uma string" });
+            res.status(400).json({ message: "ID da categoria deve ser uma string" });
+            return;
         }
         if (typeof preco !== "number") {
-            return res.status(400).json({ message: "Preço deve ser um número" });
+            res.status(400).json({ message: "Preço deve ser um número" });
+            return;
         }
         if (typeof descricao !== "string") {
-            return res.status(400).json({ message: "Descrição deve ser uma string" });
+            res.status(400).json({ message: "Descrição deve ser uma string" });
+            return;
         }
         const produto = await ProdutoService.criarProduto(nome, id_categoria, preco, descricao);
         res.status(201).json(produto);
@@ -49,22 +54,28 @@ exports.atualizarProduto = async (req, res) => {
         const id = req.params.id;
 
         if (!id || typeof id !== "string") {
-            return res.status(400).json({ message: "ID inválido" });
+            res.status(400).json({ message: "ID inválido" });
+            return;
         }
         if (!nome || !id_categoria || !preco || !descricao) {
-            return res.status(400).json({ message: "Todos os campos devem ser preenchidos" });
+            res.status(400).json({ message: "Todos os campos devem ser preenchidos" });
+            return;
         }
         if (typeof nome !== "string") {
-            return res.status(400).json({ message: "Nome deve ser uma string" });
+            res.status(400).json({ message: "Nome deve ser uma string" });
+            return;
         }
         if (typeof id_categoria !== "string") {
-            return res.status(400).json({ message: "ID da categoria deve ser uma string" });
+            res.status(400).json({ message: "ID da categoria deve ser uma string" });
+            return;
         }
         if (typeof preco !== "number") {
-            return res.status(400).json({ message: "Preço deve ser um número" });
+            res.status(400).json({ message: "Preço deve ser um número" });
+            return;
         }
         if (typeof descricao !== "string") {
-            return res.status(400).json({ message: "Descrição deve ser uma string" });
+            res.status(400).json({ message: "Descrição deve ser uma string" });
+            return;
         }
 
         const produto = await ProdutoService.atualizarProduto(id, { nome, id_categoria, preco, descricao });
@@ -81,11 +92,13 @@ exports.deletarProduto = async (req, res) => {
     try {
         const id = req.params.id;
         if (!id || typeof id !== "string") {
-            return res.status(400).json({ message: "ID inválido" });
+            res.status(400).json({ message: "ID inválido" });
+            return;
         }
         const produto = await ProdutoService.deletarProduto(id);
         if (!produto) {
-            return res.status(404).json({ message: "Produto não encontrado" });
+            res.status(404).json({ message: "Produto não encontrado" });
+            return;
         }
         res.status(204).json({ message: "Produto deletado com sucesso" });
     } catch (error) {
@@ -97,11 +110,13 @@ exports.obterProdutosPorCategoria = async (req, res) => {
     try {
         const id_categoria = req.params.id_categoria;
         if (!id_categoria || typeof id_categoria !== "string") {
-            return res.status(400).json({ message: "ID da categoria inválido" });
+            res.status(400).json({ message: "ID da categoria inválido" });
+            return;
         }
         const produtos = await ProdutoService.obterProdutosPorCategoria(id_categoria);
         if (!produtos) {
-            return res.status(404).json({ message: "Nenhum produto encontrado para a categoria" });
+            res.status(404).json({ message: "Nenhum produto encontrado para a categoria" });
+            return;
         }
         res.status(200).json(produtos);
     } catch (error) {
