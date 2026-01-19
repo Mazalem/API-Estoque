@@ -1,9 +1,9 @@
 openapi: 3.0.0
 
 info:
-  title: API de Estoque
+  title: API de estoques
   version: 1.1.0
-  description: API para gerenciamento de estoque, produtos, categorias e vendas.
+  description: API para gerenciamento de estoques, produtos, categorias e vendas.
 
 servers:
   - url: http://localhost:3000
@@ -12,7 +12,7 @@ servers:
 tags:
   - name: Produtos
   - name: Categorias
-  - name: Estoque
+  - name: estoques
   - name: Vendas
 
 paths:
@@ -27,14 +27,14 @@ paths:
           content:
             application/json:
               example:
-                - id: "693afda0f6437add7f9646p1"
+                - __id: "693afda0f6437add7f9646p1"
                   nome: "Arroz 5kg"
-                  idCategoria: "693afda0f6437add7f9646c1"
+                  id_categoria: "693afda0f6437add7f9646c1"
                   preco: 24.90
                   descricao: "Arroz tipo 1"
-                - id: "693afda0f6437add7f9646p2"
+                - _id: "693afda0f6437add7f9646p2"
                   nome: "Feijão Preto"
-                  idCategoria: "693afda0f6437add7f9646c1"
+                  id_categoria: "693afda0f6437add7f9646c1"
                   preco: 8.50
                   descricao: "Feijão selecionado"
 
@@ -49,7 +49,7 @@ paths:
               $ref: '#/components/schemas/Produto'
             example:
               nome: "Macarrão"
-              idCategoria: "693afda0f6437add7f9646c2"
+              id_categoria: "693afda0f6437add7f9646c2"
               preco: 4.50
               descricao: "Macarrão espaguete"
       responses:
@@ -58,9 +58,9 @@ paths:
           content:
             application/json:
               example:
-                id: "693afda0f6437add7f9646p3"
+                _id: "693afda0f6437add7f9646p3"
                 nome: "Macarrão"
-                idCategoria: "693afda0f6437add7f9646c2"
+                id_categoria: "693afda0f6437add7f9646c2"
                 preco: 4.50
                 descricao: "Macarrão espaguete"
 
@@ -80,9 +80,9 @@ paths:
           content:
             application/json:
               example:
-                id: "693afda0f6437add7f9646p1"
+                _id: "693afda0f6437add7f9646p1"
                 nome: "Arroz 5kg"
-                idCategoria: "693afda0f6437add7f9646c1"
+                id_categoria: "693afda0f6437add7f9646c1"
                 preco: 24.90
                 descricao: "Arroz tipo 1"
         '404':
@@ -104,7 +104,7 @@ paths:
             schema: { $ref: '#/components/schemas/Produto' }
             example:
               nome: "Arroz Premium 5kg"
-              idCategoria: "693afda0f6437add7f9646c1"
+              id_categoria: "693afda0f6437add7f9646c1"
               preco: 29.90
               descricao: "Arroz melhorado"
       responses:
@@ -113,9 +113,9 @@ paths:
           content:
             application/json:
               example:
-                id: "693afda0f6437add7f9646p1"
+                _id: "693afda0f6437add7f9646p1"
                 nome: "Arroz Premium 5kg"
-                idCategoria: "693afda0f6437add7f9646c1"
+                id_categoria: "693afda0f6437add7f9646c1"
                 preco: 29.90
 
     delete:
@@ -131,13 +131,13 @@ paths:
         '204':
           description: Produto removido
 
-  /produtos/categoria/{idCategoria}:
+  /produtos/categoria/{id_categoria}:
     get:
       tags: [Produtos]
       summary: Lista produtos por categoria
       parameters:
         - in: path
-          name: idCategoria
+          name: id_categoria
           required: true
           schema:
             type: string
@@ -147,9 +147,9 @@ paths:
           content:
             application/json:
               example:
-                - id: "693afda0f6437add7f9646p1"
+                - _id: "693afda0f6437add7f9646p1"
                   nome: "Arroz 5kg"
-                  idCategoria: "693afda0f6437add7f9646c1"
+                  id_categoria: "693afda0f6437add7f9646c1"
                   preco: 24.90
 
   /categorias:
@@ -162,9 +162,9 @@ paths:
           content:
             application/json:
               example:
-                - id: "693afda0f6437add7f9646c1"
+                - _id: "693afda0f6437add7f9646c1"
                   nome: "Alimentos"
-                - id: "693afda0f6437add7f9646c2"
+                - _id: "693afda0f6437add7f9646c2"
                   nome: "Higiene"
 
     post:
@@ -183,7 +183,7 @@ paths:
           content:
             application/json:
               example:
-                id: "693afda0f6437add7f9646c3"
+                _id: "693afda0f6437add7f9646c3"
                 nome: "Bebidas"
 
   /categorias/{id}:
@@ -202,7 +202,7 @@ paths:
           content:
             application/json:
               example:
-                id: "693afda0f6437add7f9646c1"
+                _id: "693afda0f6437add7f9646c1"
                 nome: "Alimentos"
 
     put:
@@ -237,13 +237,13 @@ paths:
       responses:
         '204':
           description: Categoria removida
-  /estoque:
+  /estoques:
     get:
-      tags: [Estoque]
-      summary: Lista estoque de todos os produtos
+      tags: [estoques]
+      summary: Lista estoques de todos os produtos
       responses:
         '200':
-          description: Estoque retornado
+          description: estoques retornado
           content:
             application/json:
               example:
@@ -252,10 +252,10 @@ paths:
                 - idProduto: "693afda0f6437add7f9646p2"
                   quantidade: 44
 
-  /estoque/{idProduto}:
+  /estoques/{idProduto}:
     get:
-      tags: [Estoque]
-      summary: Consulta estoque de um produto
+      tags: [estoques]
+      summary: Consulta estoques de um produto
       parameters:
         - in: path
           name: idProduto
@@ -264,22 +264,22 @@ paths:
             type: string
       responses:
         '200':
-          description: Estoque encontrado
+          description: estoques encontrado
           content:
             application/json:
               example:
                 idProduto: "693afda0f6437add7f9646p1"
                 quantidade: 150
 
-  /estoque/movimentar:
+  /estoques/movimentar:
     post:
-      tags: [Estoque]
-      summary: Movimenta estoque
+      tags: [estoques]
+      summary: Movimenta estoques
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/MovimentoEstoque' }
+            schema: { $ref: '#/components/schemas/Movimentoestoques' }
             example:
               idProduto: "693afda0f6437add7f9646p1"
               tipo: "entrada"
@@ -303,7 +303,7 @@ paths:
           content:
             application/json:
               example:
-                - id: "693afda0f6437add7f9646v1"
+                - _id: "693afda0f6437add7f9646v1"
                   data: "2025-01-20"
                   total: 120.50
                   itens:
@@ -331,7 +331,7 @@ paths:
           content:
             application/json:
               example:
-                id: "693afda0f6437add7f964610"
+                _id: "693afda0f6437add7f964610"
                 total: 58.30
                 data: "2025-02-01"
 
@@ -349,7 +349,7 @@ paths:
           content:
             application/json:
               example:
-                id: "v1"
+                _id: "v1"
                 total: 120.50
                 data: "2025-01-20"
                 itens:
@@ -365,10 +365,10 @@ components:
       type: object
       properties:
         nome: { type: string }
-        idCategoria: { type: string }
+        id_categoria: { type: string }
         preco: { type: number }
         descricao: { type: string }
-      required: [nome, idCategoria]
+      required: [nome, id_categoria]
 
     Categoria:
       type: object
@@ -376,7 +376,7 @@ components:
         nome: { type: string }
       required: [nome]
 
-    MovimentoEstoque:
+    Movimentoestoques:
       type: object
       properties:
         idProduto: { type: string }

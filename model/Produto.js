@@ -1,6 +1,7 @@
 require("dotenv").config();
 const DbMongo = require("../database/DbMongo");
 const mongodb = require("mongodb");
+const { ObjectId } = require("mongodb");
 
 class Produto {
   constructor(nome, id_categoria, preco, descricao) {
@@ -41,30 +42,32 @@ class Produto {
 
   static async obterProduto(id) {
     await DbMongo.connect();
-    return DbMongo.getDB().collection('produtos').findOne({ _id: mongodb.ObjectId(id) });
+    return DbMongo.getDB().collection('produtos').findOne({ _id: new ObjectId(id) });
   }
 
   static async atualizarProduto(id, produto) {
     await DbMongo.connect();
 
-    const result = await DbMongo.getDB()
+    const resultado = await DbMongo.getDB()
       .collection('produtos')
       .findOneAndUpdate(
-        { _id: new mongodb.ObjectId(id) },
-        { $set: produto },
-        { returnDocument: 'after' }
+        { _id: new ObjectId(id) },
+        { $set: produto }
       );
 
-    return result.value;
+    return {
+      _id: id,
+      ...produto
+    };
   }
 
   static async deletarProduto(id) {
     await DbMongo.connect();
 
     const resultado = await DbMongo.getDB().collection('produtos')
-      .deleteOne({ _id: new mongodb.ObjectId(id) });
+      .deleteOne({ _id: new ObjectId(id) });
 
-    return resultado.deletedCount === 1;
+    return resultado;
   }
 
   static async obterProdutosPorCategoria(id_categoria) {
