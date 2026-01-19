@@ -17,8 +17,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 app.use('/vendas', vendaRouter);
-app.use('/estoque', estoqueRouter);
-app.use('/produto', produtoRouter);
+app.use('/estoques', estoqueRouter);
+app.use('/produtos', produtoRouter);
 // swagger
 swaggerDocs(app);
 

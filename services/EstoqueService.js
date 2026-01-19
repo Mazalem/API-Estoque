@@ -18,6 +18,14 @@ exports.getEstoque = async (id) => {
     }
 }
 
+exports.getEstoqueByProduto = async (id) => {
+    try {
+        return await Estoque.getEstoqueByProduto(id);
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
 
 exports.movimentarEstoque = async (id_produto, quantidade, tipo) => {
     try {
@@ -25,9 +33,9 @@ exports.movimentarEstoque = async (id_produto, quantidade, tipo) => {
         if (!estoqueExiste) {
             return null;
         }
-        if(tipo === "saida"){
+        if (tipo === "saida") {
             quantidade = -quantidade;
-            if(estoqueExiste.quantidade + quantidade < 0){
+            if (estoqueExiste.quantidade + quantidade < 0) {
                 throw new Error("Estoque insuficiente");
             }
         }
@@ -53,11 +61,11 @@ exports.deletarEstoque = async (id) => {
 
 exports.criarEstoque = async (id_produto) => {
     try {
-        if (!id_produto || typeof id_produto !== "string") {
+        if (!id_produto) {
             throw new Error("ID do produto inválido");
         }
         const estoque = new Estoque(id_produto);
-        await Estoque.criarEstoque(estoque);
+        return await Estoque.criarEstoque(estoque);
     } catch (error) {
         console.log(error);
         throw error;

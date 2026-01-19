@@ -20,10 +20,6 @@ exports.criarProduto = async (req, res) => {
             res.status(400).json({ message: "Nome deve ser uma string" });
             return;
         }
-        if (typeof id_categoria !== "string") {
-            res.status(400).json({ message: "ID da categoria deve ser uma string" });
-            return;
-        }
         if (typeof preco !== "number") {
             res.status(400).json({ message: "Preço deve ser um número" });
             return;
@@ -33,7 +29,11 @@ exports.criarProduto = async (req, res) => {
             return;
         }
         const produto = await ProdutoService.criarProduto(nome, id_categoria, preco, descricao);
-        res.status(201).json(produto);
+        if (!produto || !produto.produtoCriado || !produto.estoqueCriado) {
+            res.status(400).json({ message: "Erro ao criar produto" });
+            return;
+        }
+        res.status(201).json(produto.produtoCriado);
     } catch (error) {
         res.status(500).json({ message: "Erro ao criar produto" });
     }
@@ -53,7 +53,7 @@ exports.atualizarProduto = async (req, res) => {
         const { nome, id_categoria, preco, descricao } = req.body;
         const id = req.params.id;
 
-        if (!id || typeof id !== "string") {
+        if (!id) {
             res.status(400).json({ message: "ID inválido" });
             return;
         }
@@ -63,10 +63,6 @@ exports.atualizarProduto = async (req, res) => {
         }
         if (typeof nome !== "string") {
             res.status(400).json({ message: "Nome deve ser uma string" });
-            return;
-        }
-        if (typeof id_categoria !== "string") {
-            res.status(400).json({ message: "ID da categoria deve ser uma string" });
             return;
         }
         if (typeof preco !== "number") {
@@ -91,7 +87,7 @@ exports.atualizarProduto = async (req, res) => {
 exports.deletarProduto = async (req, res) => {
     try {
         const id = req.params.id;
-        if (!id || typeof id !== "string") {
+        if (!id) {
             res.status(400).json({ message: "ID inválido" });
             return;
         }
@@ -99,8 +95,8 @@ exports.deletarProduto = async (req, res) => {
         if (!produto) {
             res.status(404).json({ message: "Produto não encontrado" });
             return;
-        }
-        res.status(204).json({ message: "Produto deletado com sucesso" });
+        }else
+            res.status(200).json({ message: "Produto deletado com sucesso" });
     } catch (error) {
         res.status(500).json({ message: "Erro ao deletar produto" });
     }
@@ -109,7 +105,7 @@ exports.deletarProduto = async (req, res) => {
 exports.obterProdutosPorCategoria = async (req, res) => {
     try {
         const id_categoria = req.params.id_categoria;
-        if (!id_categoria || typeof id_categoria !== "string") {
+        if (!id_categoria) {
             res.status(400).json({ message: "ID da categoria inválido" });
             return;
         }

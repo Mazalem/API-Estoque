@@ -13,9 +13,13 @@ exports.listarProdutos = async () => {
 exports.criarProduto = async (nome, id_categoria, preco, descricao) => {
     try {
         const produto = new Produto(nome, id_categoria, preco, descricao);
-        produto = await Produto.criarProduto(produto);
-        await EstoqueService.criarEstoque(produto._id);
-        return produto;
+        const produtoCriado = await Produto.criarProduto(produto);
+        const estoqueCriado = await EstoqueService.criarEstoque(produtoCriado._id);
+        if (estoqueCriado) {
+            return { produtoCriado, estoqueCriado };
+        }
+        await Produto.deletarProduto(produtoCriado._id);
+        return null;
     } catch (error) {
         console.log(error);
         throw error;
@@ -51,7 +55,15 @@ exports.deletarProduto = async (id) => {
         if (!produtoExiste) {
             return null;
         }
-        return await Produto.deletarProduto(id);
+        const estoque = await EstoqueService.getEstoqueByProduto(id);
+        if (estoque) {
+            await EstoqueService.deletarEstoque(estoque._id);
+        }
+        const resposta = await Produto.deletarProduto(id);
+        if(resposta.deletedCount === 1){
+            return true;
+        }
+        return false;
     } catch (error) {
         console.log(error);
         throw error;
