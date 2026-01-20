@@ -4,7 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
-//const vendaRouter = require("../routes/VendaRouter");
+const vendaRouter = require("../routes/VendaRouter");
 const estoqueRouter = require("../routes/EstoqueRouter");
 const produtoRouter = require("../routes/ProdutoRouter");
 const categoriasRouter = require('../routes/CategoriasRoutes');
@@ -18,7 +18,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-//app.use('/vendas', vendaRouter);
+app.use('/vendas', vendaRouter);
 app.use('/estoques', estoqueRouter);
 app.use('/produtos', produtoRouter);
 app.use('/categorias', categoriasRouter);

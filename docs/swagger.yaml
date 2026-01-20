@@ -321,20 +321,26 @@ paths:
             schema: { $ref: '#/components/schemas/Venda' }
             example:
               itens:
-                - id_produto: "693afda0f6437add7f964613"
-                  quantidade: 2
-                - id_produto: "693afda0f6437add7f964617"
+                - id_produto: "696ef3581781c8232b84ff9f"
                   quantidade: 1
+                - id_produto: "696ef497503922700f59db5a"
+                  quantidade: 2
       responses:
         '201':
           description: Venda registrada
           content:
             application/json:
               example:
-                _id: "693afda0f6437add7f964610"
-                total: 58.30
-                data: "2025-02-01"
-
+                  "_id": "696fd309641409858f11fcc3"
+                  "data": "2026-01-20T19:10:01.545Z"
+                  "total": 16
+                  "itens":
+                       - "id_produto": "696ef3581781c8232b84ff9f"
+                         "quantidade": 1
+                         "preco_unitario": 6
+                       - "id_produto": "696ef497503922700f59db5a"
+                         "quantidade": 2
+                         "preco_unitario": 5
   /vendas/{id}:
     get:
       tags: [Vendas]
@@ -343,6 +349,8 @@ paths:
         - in: path
           name: id
           required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Venda retornada
@@ -358,6 +366,122 @@ paths:
                     precoUnitario: 24.90
         '404':
           description: Venda não encontrada
+
+    put:
+      tags: [Vendas]
+      summary: Atualiza venda
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [itens]
+              properties:
+                itens:
+                  type: array
+                  minItems: 1
+                  items:
+                    type: object
+                    required: [id_produto, quantidade]
+                    properties:
+                      id_produto:
+                        type: string
+                      quantidade:
+                        type: number
+                        minimum: 1
+            example:
+              itens:
+                - id_produto: "696ef3581781c8232b84ff9f"
+                  quantidade: 1
+                - id_produto: "696ef497503922700f59db5a"
+                  quantidade: 2
+      responses:
+        '200':
+          description: Venda atualizada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  data:
+                    type: string
+                    format: date-time
+                  total:
+                    type: number
+                  itens:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id_produto:
+                          type: string
+                        quantidade:
+                          type: number
+                        preco_unitario:
+                          type: number
+              example:
+                _id: "696fd309641409858f11fcc3"
+                data: "2026-01-20T19:10:01.545Z"
+                total: 16
+                itens:
+                  - id_produto: "696ef3581781c8232b84ff9f"
+                    quantidade: 1
+                    preco_unitario: 6
+                  - id_produto: "696ef497503922700f59db5a"
+                    quantidade: 2
+                    preco_unitario: 5
+        '400':
+          description: Erro de validação (ID ou itens inválidos)
+        '404':
+          description: Venda não encontrada
+        '500':
+          description: Erro interno do servidor
+
+    delete:
+      tags: [Vendas]
+      summary: Remove venda
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Venda deletada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              example:
+                message: "Venda deletada com sucesso"
+        '400':
+          description: ID não fornecido
+          content:
+            application/json:
+              example:
+                error: "ID não fornecido"
+        '404':
+          description: Venda não encontrada
+          content:
+            application/json:
+              example:
+                error: "Venda não encontrada"
+        '500':
+          description: Erro interno do servidor
+
 components:
   schemas:
 
