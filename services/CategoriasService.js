@@ -1,29 +1,56 @@
 const Categoria = require("../model/Categoria");
 
-const listar = async () => {
-  return await Categoria.listar();
+exports.listarCategorias = async () => {
+  try {
+    return await Categoria.listarCategorias();
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };
 
-const criar = async (categoria) => {
-  return await Categoria.criar(categoria);
+exports.criarCategoria = async (nome) => {
+  try {
+    const categoria = new Categoria(nome);
+    return await Categoria.criarCategoria(categoria);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };
 
-const buscarPorId = async (id) => {
-  return await Categoria.buscarPorId(id);
+exports.buscarCategoriaPorId = async (id_categoria) => {
+  try {
+    return await Categoria.buscarCategoriaPorId(id_categoria);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };
 
-const atualizar = async (id, dadosAtualizados) => {
-  return await Categoria.atualizar(id, dadosAtualizados);
+exports.atualizarCategoria = async (id_categoria, categoria) => {
+  try {
+    const categoriaExiste = await Categoria.buscarCategoriaPorId(id_categoria);
+    if (!categoriaExiste) {
+      return null;
+    }
+    const categoriaAtualizada = new Categoria(categoria.nome);
+    return await Categoria.atualizarCategoria(id_categoria, categoriaAtualizada);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };
 
-const remover = async (id) => {
-  return await Categoria.remover(id);
-};
-
-module.exports = {
-  listar,
-  criar,
-  buscarPorId,
-  atualizar,
-  remover
+exports.removerCategoria = async (id_categoria) => {
+  try {
+    const categoriaExiste = await Categoria.buscarCategoriaPorId(id_categoria);
+    if (!categoriaExiste) {
+      return null;
+    }
+    return await Categoria.removerCategoria(id_categoria);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
 };

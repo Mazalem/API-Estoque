@@ -7,7 +7,6 @@ const logger = require('morgan');
 //const vendaRouter = require("../routes/VendaRouter");
 const estoqueRouter = require("../routes/EstoqueRouter");
 const produtoRouter = require("../routes/ProdutoRouter");
-
 const categoriasRouter = require('../routes/CategoriasRoutes');
 
 const { swaggerDocs } = require("../config/swagger");
