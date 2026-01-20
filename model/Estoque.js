@@ -33,24 +33,28 @@ class Estoque {
       .findOne({ _id: new ObjectId(id) });
   }
 
-  static async getEstoqueByProduto(id) {
+  static async getEstoqueByProduto(id_produto) {
     await DbMongo.connect();
     return DbMongo.getDB()
       .collection("estoque")
-      .findOne({ id_produto: new ObjectId(id) });
+      .findOne({ id_produto: new ObjectId(id_produto) });
   }
 
-  static async movimentarEstoque(id, quantidade) {
+  static async movimentarEstoque(id_produto, quantidade) {
     await DbMongo.connect();
 
     const resultado = await DbMongo.getDB()
       .collection("estoque")
       .findOneAndUpdate(
-        { _id: new ObjectId(id) },
+        { id_produto: new ObjectId(id_produto) },
         { $inc: { quantidade } }
       );
 
-    return resultado;
+    return {
+      _id: resultado._id,
+      id_produto: resultado.id_produto,
+      quantidade: resultado.quantidade + quantidade
+    };
   }
 
   static async deletarEstoque(id) {

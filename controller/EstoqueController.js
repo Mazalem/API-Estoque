@@ -16,7 +16,7 @@ exports.getEstoque = async (req, res) => {
             res.status(400).json({ message: "Dados inválidos" });
             return;
         }
-        const estoque = await EstoqueService.getEstoque(id);
+        const estoque = await EstoqueService.getEstoqueByProduto(id);
         res.status(200).json(estoque);
     } catch (error) {
         res.status(500).json({ message: "Erro ao buscar estoque" });
@@ -46,23 +46,5 @@ exports.movimentarEstoque = async (req, res) => {
         res.status(200).json(estoque);
     } catch (error) {
         res.status(500).json({ message: "Erro ao movimentar estoque" });
-    }
-}
-
-exports.deletarEstoque = async (req, res) => {
-    try {
-        const { id } = req.params;
-        if (!id) {
-            res.status(400).json({ message: "Dados inválidos" });
-            return;
-        }
-        const estoque = await EstoqueService.deletarEstoque(id);
-        if (!estoque) {
-            res.status(404).json({ message: "Estoque não encontrado" });
-            return;
-        }
-        res.status(200).json(estoque);
-    } catch (error) {
-        res.status(500).json({ message: "Erro ao deletar estoque" });
     }
 }

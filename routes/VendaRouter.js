@@ -1,6 +1,6 @@
-let express = require('express');
-let router = express.Router();
-let VendaController = require('../controller/VendaController');
+const express = require('express');
+const router = express.Router();
+const VendaController = require('../controller/VendaController');
 
 //router.get('/listar', VendaController.listarVendas);
 
