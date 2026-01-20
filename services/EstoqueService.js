@@ -29,7 +29,7 @@ exports.getEstoqueByProduto = async (id) => {
 
 exports.movimentarEstoque = async (id_produto, quantidade, tipo) => {
     try {
-        const estoqueExiste = await Estoque.getEstoque(id_produto);
+        const estoqueExiste = await Estoque.getEstoqueByProduto(id_produto);
         if (!estoqueExiste) {
             return null;
         }
@@ -48,7 +48,7 @@ exports.movimentarEstoque = async (id_produto, quantidade, tipo) => {
 
 exports.deletarEstoque = async (id) => {
     try {
-        const estoqueExiste = await Estoque.getEstoque(id);
+        const estoqueExiste = await this.getEstoque(id);
         if (!estoqueExiste) {
             return null;
         }

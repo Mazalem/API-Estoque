@@ -12,7 +12,7 @@ servers:
 tags:
   - name: Produtos
   - name: Categorias
-  - name: estoques
+  - name: Estoques
   - name: Vendas
 
 paths:
@@ -239,41 +239,41 @@ paths:
           description: Categoria removida
   /estoques:
     get:
-      tags: [estoques]
+      tags: [Estoques]
       summary: Lista estoques de todos os produtos
       responses:
         '200':
-          description: estoques retornado
+          description: Estoques retornados
           content:
             application/json:
               example:
-                - idProduto: "693afda0f6437add7f9646p1"
+                - id_produto: "693afda0f6437add7f9646p1"
                   quantidade: 150
-                - idProduto: "693afda0f6437add7f9646p2"
+                - id_produto: "693afda0f6437add7f9646p2"
                   quantidade: 44
 
-  /estoques/{idProduto}:
+  /estoques/{id_produto}:
     get:
-      tags: [estoques]
+      tags: [Estoques]
       summary: Consulta estoques de um produto
       parameters:
         - in: path
-          name: idProduto
+          name: id_produto
           required: true
           schema:
             type: string
       responses:
         '200':
-          description: estoques encontrado
+          description: Estoques encontrados
           content:
             application/json:
               example:
-                idProduto: "693afda0f6437add7f9646p1"
+                id_produto: "693afda0f6437add7f9646p1"
                 quantidade: 150
 
   /estoques/movimentar:
     post:
-      tags: [estoques]
+      tags: [Estoques]
       summary: Movimenta estoques
       requestBody:
         required: true
@@ -281,7 +281,7 @@ paths:
           application/json:
             schema: { $ref: '#/components/schemas/Movimentoestoques' }
             example:
-              idProduto: "693afda0f6437add7f9646p1"
+              id_produto: "693afda0f6437add7f9646p1"
               tipo: "entrada"
               quantidade: 20
       responses:
@@ -290,9 +290,9 @@ paths:
           content:
             application/json:
               example:
-                idProduto: "693afda0f6437add7f9646p1"
+                _id: "693afda0f6437add7f9646m1"
+                id_produto: "693afda0f6437add7f9646p1"
                 quantidade: 20
-                data: "2025-02-01"
   /vendas:
     get:
       tags: [Vendas]
@@ -307,7 +307,7 @@ paths:
                   data: "2025-01-20"
                   total: 120.50
                   itens:
-                    - idProduto: "693afda0f6437add7f964612"
+                    - id_produto: "693afda0f6437add7f964612"
                       quantidade: 2
                       precoUnitario: 24.90
 
@@ -321,9 +321,9 @@ paths:
             schema: { $ref: '#/components/schemas/Venda' }
             example:
               itens:
-                - idProduto: "693afda0f6437add7f964613"
+                - id_produto: "693afda0f6437add7f964613"
                   quantidade: 2
-                - idProduto: "693afda0f6437add7f964617"
+                - id_produto: "693afda0f6437add7f964617"
                   quantidade: 1
       responses:
         '201':
@@ -353,7 +353,7 @@ paths:
                 total: 120.50
                 data: "2025-01-20"
                 itens:
-                  - idProduto: "693afda0f6437add7f964613"
+                  - id_produto: "693afda0f6437add7f964613"
                     quantidade: 2
                     precoUnitario: 24.90
         '404':
@@ -376,12 +376,12 @@ components:
         nome: { type: string }
       required: [nome]
 
-    Movimentoestoques:
+    Estoque:
       type: object
       properties:
-        idProduto: { type: string }
+        id_produto: { type: string }
         quantidade: { type: integer }
-      required: [idProduto, quantidade]
+      required: [id_produto, quantidade]
 
     Venda:
       type: object
@@ -391,6 +391,6 @@ components:
           items:
             type: object
             properties:
-              idProduto: { type: string }
+              id_produto: { type: string }
               quantidade: { type: integer }
       required: [itens]
