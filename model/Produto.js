@@ -6,7 +6,7 @@ const { ObjectId } = require("mongodb");
 class Produto {
   constructor(nome, id_categoria, preco, descricao) {
     if (!nome || typeof nome !== 'string') throw new Error('Nome inválido');
-    if (!id_categoria || typeof id_categoria !== 'string') throw new Error('ID da categoria inválido');
+    if (!id_categoria || !ObjectId.isValid(id_categoria)) throw new Error('ID da categoria inválido');
     if (typeof preco !== 'number' || preco < 0) throw new Error('Preço inválido');
     if (!descricao || typeof descricao !== 'string') throw new Error('Descrição inválida');
 
@@ -21,7 +21,7 @@ class Produto {
   getPreco() { return this.preco; }
   getDescricao() { return this.descricao; }
   setNome(nome) { if (!nome || typeof nome !== 'string') throw new Error('Nome inválido'); this.nome = nome; }
-  setIdCategoria(id_categoria) { if (!id_categoria || typeof id_categoria !== 'string') throw new Error('ID da categoria inválido'); this.id_categoria = id_categoria; }
+  setIdCategoria(id_categoria) { if (!id_categoria || !ObjectId.isValid(id_categoria)) throw new Error('ID da categoria inválido'); this.id_categoria = id_categoria; }
   setPreco(preco) { if (typeof preco !== 'number' || preco < 0) throw new Error('Preço inválido'); this.preco = preco; }
   setDescricao(descricao) { if (!descricao || typeof descricao !== 'string') throw new Error('Descrição inválida'); this.descricao = descricao; }
 
@@ -47,6 +47,7 @@ class Produto {
 
   static async atualizarProduto(id, produto) {
     await DbMongo.connect();
+    produto.id_categoria = new ObjectId(produto.id_categoria);
 
     const resultado = await DbMongo.getDB()
       .collection('produtos')
@@ -72,7 +73,7 @@ class Produto {
 
   static async obterProdutosPorCategoria(id_categoria) {
     await DbMongo.connect();
-    return DbMongo.getDB().collection('produtos').find({ id_categoria }).toArray();
+    return DbMongo.getDB().collection('produtos').find({ id_categoria: new ObjectId(id_categoria) }).toArray();
   }
 
 }

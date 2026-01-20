@@ -1,5 +1,6 @@
 const Produto = require("../model/Produto");
 const EstoqueService = require("./EstoqueService");
+const CategoriaService = require("./CategoriasService");
 
 exports.listarProdutos = async () => {
     try {
@@ -12,7 +13,10 @@ exports.listarProdutos = async () => {
 
 exports.criarProduto = async (nome, id_categoria, preco, descricao) => {
     try {
-        const produto = new Produto(nome, id_categoria, preco, descricao);
+        const categoria = await CategoriaService.buscarCategoriaPorId(id_categoria);
+        if (!categoria) return null;
+        
+        const produto = new Produto(nome, categoria._id, preco, descricao);
         const produtoCriado = await Produto.criarProduto(produto);
         const estoqueCriado = await EstoqueService.criarEstoque(produtoCriado._id);
         if (estoqueCriado) {
@@ -72,6 +76,8 @@ exports.deletarProduto = async (id) => {
 
 exports.obterProdutosPorCategoria = async (id_categoria) => {
     try {
+        const categoriaExiste = await CategoriaService.buscarCategoriaPorId(id_categoria);
+        if (!categoriaExiste) return null;
         return await Produto.obterProdutosPorCategoria(id_categoria);
     } catch (error) {
         console.log(error);

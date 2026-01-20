@@ -1,82 +1,59 @@
 const categoriasService = require('../services/CategoriasService');
 
-const listar = async (req, res) => {
+exports.listarCategorias = async (req, res) => {
     try {
-        const categorias = await categoriasService.listar();
+        const categorias = await categoriasService.listarCategorias();
         res.status(200).json(categorias);
     } catch (err) {
         res.status(500).json({ erro: err.message });
     }
 };
 
-const criar = async (req, res) => {
-    const { nome } = req.body;
-    if (!nome) {
-        return res.status(400).json({ erro: "Campo 'nome' é obrigatório" });
-    }
-
+exports.criarCategoria = async (req, res) => {
     try {
-        const novaCategoria = await categoriasService.criar({ nome });
+        const { nome } = req.body;
+        if (!nome) return res.status(400).json({ erro: "Campo 'nome' é obrigatório" });
+        const novaCategoria = await categoriasService.criarCategoria(nome);
         res.status(201).json(novaCategoria);
     } catch (err) {
         res.status(500).json({ erro: err.message });
     }
 };
 
-const buscarPorId = async (req, res) => {
+exports.buscarCategoriaPorId = async (req, res) => {
     const { id } = req.params;
     try {
-        const categoria = await categoriasService.buscarPorId(id);
-
-        if (!categoria) {
-            return res.status(404).json({ mensagem: "Categoria não encontrada" });
-        }
-
+        const categoria = await categoriasService.buscarCategoriaPorId(id);
+        if (!categoria) return res.status(404).json({ mensagem: "Categoria não encontrada" });
         res.status(200).json(categoria);
     } catch (err) {
         res.status(500).json({ erro: err.message });
     }
 };
 
-const atualizar = async (req, res) => {
-    const { id } = req.params;
-    const { nome } = req.body;
-
-    if (!nome) {
-        return res.status(400).json({ erro: "Campo 'nome' é obrigatório" });
-    }
-
+exports.atualizarCategoria = async (req, res) => {
     try {
-        const categoriaAtualizada = await categoriasService.atualizar(id, { nome });
+        const { id } = req.params;
+        const { nome } = req.body;
 
-        if (!categoriaAtualizada) {
-            return res.status(404).json({ mensagem: "Categoria não encontrada" });
-        }
+        if (!nome || !id) return res.status(400).json({ erro: "Campo 'nome' e 'id' são obrigatórios" });
+        if (typeof nome !== "string") return res.status(400).json({ erro: "Campo 'nome' deve ser uma string" });
 
+        const categoriaAtualizada = await categoriasService.atualizarCategoria(id, { nome });
+        if (!categoriaAtualizada) return res.status(404).json({ mensagem: "Categoria não encontrada" });
         res.status(200).json(categoriaAtualizada);
     } catch (err) {
         res.status(500).json({ erro: err.message });
     }
 };
 
-const remover = async (req, res) => {
+exports.removerCategoria = async (req, res) => {
     const { id } = req.params;
     try {
-        const removido = await categoriasService.remover(id);
-
-        if (!removido) {
-            return res.status(404).json({ mensagem: "Categoria não encontrada" });
-        }
-        res.status(204).send();
+        const removido = await categoriasService.removerCategoria(id);
+        if (!removido) return res.status(404).json({ mensagem: "Categoria não encontrada" });
+        res.status(200).json({ message: "Categoria removida com sucesso" });
     } catch (err) {
         res.status(500).json({ erro: err.message });
     }
-};
-
-module.exports = {
-    listar,
-    criar,
-    buscarPorId,
-    atualizar,
-    remover
 };
