@@ -20,6 +20,10 @@ exports.criarProduto = async (req, res) => {
             res.status(400).json({ message: "Nome deve ser uma string" });
             return;
         }
+        if (typeof id_categoria !== "string") {
+            res.status(400).json({ message: "ID da categoria deve ser uma string" });
+            return;
+        }
         if (typeof preco !== "number") {
             res.status(400).json({ message: "Preço deve ser um número" });
             return;
