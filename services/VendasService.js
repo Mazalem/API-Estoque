@@ -19,11 +19,11 @@ exports.criarVenda = async (venda) => {
         for (const produtos of itens) {
             const produto = await ProdutoService.obterProduto(produtos.id_produto);
             if (!produto) {
-                return null;
+                throw new Error("Produto não encontrado");
             }
             const estoqueMovimentacao = await EstoqueService.movimentacaoPossivel(produtos.id_produto, produtos.quantidade, "saida");
             if (!estoqueMovimentacao) {
-                return null;
+                throw new Error("Estoque insuficiente");
             }
         }
 
@@ -58,7 +58,7 @@ exports.atualizarVenda = async (id, itens) => {
         const vendaAntiga = await this.obterVenda(id);
         let total = 0;
         if (!vendaAntiga) {
-            return null;
+            throw new Error("Venda não encontrada");
         }
         for (const element of vendaAntiga.itens) {
             await EstoqueService.movimentarEstoque(element.id_produto, element.quantidade, "entrada");
@@ -67,11 +67,11 @@ exports.atualizarVenda = async (id, itens) => {
         for (const produtos of itens) {
             const produto = await ProdutoService.obterProduto(produtos.id_produto);
             if (!produto) {
-                return null;
+                throw new Error("Produto não encontrado");
             }
             const estoqueMovimentacao = await EstoqueService.movimentacaoPossivel(produtos.id_produto, produtos.quantidade, "saida");
             if (!estoqueMovimentacao) {
-                return null;
+                throw new Error("Estoque insuficiente");
             }
         }
 
@@ -95,7 +95,7 @@ exports.deletarVenda = async (id) => {
     try{
         const vendaAntiga = await this.obterVenda(id);
         if (!vendaAntiga) {
-            return null;
+            throw new Error("Venda não encontrada");
         }
         for (const element of vendaAntiga.itens) {
             await EstoqueService.movimentarEstoque(element.id_produto, element.quantidade, "entrada");
