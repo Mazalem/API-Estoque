@@ -1,80 +1,178 @@
-const request = require('supertest');
-const app = require('../src/app');
+const categoriasController = require('../controller/CategoriasController');
+const categoriasService = require('../services/CategoriasService');
 
-describe('Categorias API', () => {
-    let novaCategoriaId;
+jest.mock('../services/CategoriasService');
 
-    it('GET /categorias - Deve listar categorias', async () => {
-        const res = await request(app).get('/categorias');
-        expect(res.statusCode).toEqual(200);
-        expect(Array.isArray(res.body)).toBeTruthy();
-        if (res.body.length > 0) {
-            expect(res.body[0]).toHaveProperty('_id');
-            expect(res.body[0]).toHaveProperty('nome');
-        }
-    });
+describe('CategoriasController Unit Tests', () => {
 
-    it('POST /categorias - Deve criar uma categoria', async () => {
-        const novaCategoria = {
-            nome: "Eletrônicos"
+    let req, res;
+
+    beforeEach(() => {
+        jest.clearAllMocks();
+        req = {
+            body: {},
+            params: {}
         };
-        const res = await request(app).post('/categorias').send(novaCategoria);
-        expect(res.statusCode).toEqual(201);
-        expect(res.body).toHaveProperty('_id');
-        expect(res.body.nome).toEqual(novaCategoria.nome);
-        novaCategoriaId = res.body._id;
+        res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        };
     });
 
-    it('POST /categorias - Deve retornar erro 400 se nome estiver ausente', async () => {
-        const res = await request(app).post('/categorias').send({});
-        expect(res.statusCode).toEqual(400);
-        expect(res.body).toHaveProperty('erro');
+    describe('listarCategorias', () => {
+        it('deve retornar status 200 e lista de categorias', async () => {
+            const mockCategorias = [{ _id: '1', nome: 'Eletrônicos' }];
+            categoriasService.listarCategorias.mockResolvedValue(mockCategorias);
+
+            await categoriasController.listarCategorias(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith(mockCategorias);
+            expect(categoriasService.listarCategorias).toHaveBeenCalledTimes(1);
+        });
+
+        it('deve retornar status 500 em caso de erro no serviço', async () => {
+            const erro = new Error('Erro banco');
+            categoriasService.listarCategorias.mockRejectedValue(erro);
+
+            await categoriasController.listarCategorias(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(500);
+            expect(res.json).toHaveBeenCalledWith({ erro: erro.message });
+        });
     });
 
-    it('GET /categorias/:id - Deve buscar categoria por id', async () => {
-        if (!novaCategoriaId) return;
-        const res = await request(app).get(`/categorias/${novaCategoriaId}`);
-        expect(res.statusCode).toEqual(200);
-        expect(res.body._id).toEqual(novaCategoriaId);
-        expect(res.body.nome).toEqual("Eletrônicos");
+    describe('criarCategoria', () => {
+        it('deve criar categoria e retornar status 201', async () => {
+            req.body = { nome: 'Livros' };
+            const novaCategoria = { _id: '2', nome: 'Livros' };
+            categoriasService.criarCategoria.mockResolvedValue(novaCategoria);
+
+            await categoriasController.criarCategoria(req, res);
+
+            expect(categoriasService.criarCategoria).toHaveBeenCalledWith('Livros');
+            expect(res.status).toHaveBeenCalledWith(201);
+            expect(res.json).toHaveBeenCalledWith(novaCategoria);
+        });
+
+        it('deve retornar status 400 se nome não informado', async () => {
+            req.body = {};
+
+            await categoriasController.criarCategoria(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.json).toHaveBeenCalledWith({ erro: "Campo 'nome' é obrigatório" });
+            expect(categoriasService.criarCategoria).not.toHaveBeenCalled();
+        });
+
+        it('deve retornar status 500 em caso de erro', async () => {
+            req.body = { nome: 'Teste' };
+            categoriasService.criarCategoria.mockRejectedValue(new Error('Erro'));
+
+            await categoriasController.criarCategoria(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(500);
+        });
     });
 
-    it('GET /categorias/:id - Deve retornar 404 para categoria inexistente', async () => {
-        const fakeId = "693afda0f6437add7f9646c9";
-        const res = await request(app).get(`/categorias/${fakeId}`);
-        expect(res.statusCode).toEqual(404);
-        expect(res.body).toHaveProperty('mensagem');
+    describe('buscarCategoriaPorId', () => {
+        it('deve retornar categoria e status 200', async () => {
+            req.params = { id: '1' };
+            const mockCategoria = { _id: '1', nome: 'Teste' };
+            categoriasService.buscarCategoriaPorId.mockResolvedValue(mockCategoria);
+
+            await categoriasController.buscarCategoriaPorId(req, res);
+
+            expect(categoriasService.buscarCategoriaPorId).toHaveBeenCalledWith('1');
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith(mockCategoria);
+        });
+
+        it('deve retornar status 404 se não encontrar', async () => {
+            req.params = { id: '999' };
+            categoriasService.buscarCategoriaPorId.mockResolvedValue(null);
+
+            await categoriasController.buscarCategoriaPorId(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(404);
+            expect(res.json).toHaveBeenCalledWith({ mensagem: 'Categoria não encontrada' });
+        });
+
+        it('deve retornar status 500 se houver erro', async () => {
+            req.params = { id: '1' };
+            categoriasService.buscarCategoriaPorId.mockRejectedValue(new Error('Fail'));
+
+            await categoriasController.buscarCategoriaPorId(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(500);
+        });
     });
 
-    it('PUT /categorias/:id - Deve atualizar categoria', async () => {
-        if (!novaCategoriaId) return;
-        const atualizacao = { nome: "Eletrônicos & Gadgets" };
-        const res = await request(app).put(`/categorias/${novaCategoriaId}`).send(atualizacao);
-        expect(res.statusCode).toEqual(200);
-        expect(res.body.nome).toEqual(atualizacao.nome);
+    describe('atualizarCategoria', () => {
+        it('deve atualizar e retornar status 200', async () => {
+            req.params = { id: '1' };
+            req.body = { nome: 'Novo Nome' };
+
+            const mockAtualizada = { _id: '1', nome: 'Novo Nome' };
+            categoriasService.atualizarCategoria.mockResolvedValue(mockAtualizada);
+
+            await categoriasController.atualizarCategoria(req, res);
+
+            expect(categoriasService.atualizarCategoria).toHaveBeenCalledWith('1', { nome: 'Novo Nome' });
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith(mockAtualizada);
+        });
+
+        it('deve retornar status 400 se nome ou id inválidos', async () => {
+            req.params = { id: '1' };
+            req.body = {};
+
+            await categoriasController.atualizarCategoria(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ erro: expect.stringMatching(/obrigatórios/) }));
+        });
+
+        it('deve retornar status 404 se categoria não encontrada', async () => {
+            req.params = { id: '999' };
+            req.body = { nome: 'Teste' };
+            categoriasService.atualizarCategoria.mockResolvedValue(null);
+
+            await categoriasController.atualizarCategoria(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(404);
+        });
     });
 
-    it('PUT /categorias/:id - Deve retornar 404 para atualização de categoria inexistente', async () => {
-        const fakeId = "693afda0f6437add7f9646c9";
-        const res = await request(app).put(`/categorias/${fakeId}`).send({ nome: "Nada" });
-        expect(res.statusCode).toEqual(404);
+    describe('removerCategoria', () => {
+        it('deve remover e retornar status 200', async () => {
+            req.params = { id: '1' };
+            categoriasService.removerCategoria.mockResolvedValue(true);
+
+            await categoriasController.removerCategoria(req, res);
+
+            expect(categoriasService.removerCategoria).toHaveBeenCalledWith('1');
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith({ message: 'Categoria removida com sucesso' });
+        });
+
+        it('deve retornar status 404 se não encontrar', async () => {
+            req.params = { id: '999' };
+            categoriasService.removerCategoria.mockResolvedValue(false);
+
+            await categoriasController.removerCategoria(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(404);
+        });
+
+        it('deve retornar status 500 em erro', async () => {
+            req.params = { id: '1' };
+            categoriasService.removerCategoria.mockRejectedValue(new Error('Erro DB'));
+
+            await categoriasController.removerCategoria(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(500);
+        });
     });
 
-    it('PUT /categorias/:id - Deve retornar 400 se nome ausente na atualização', async () => {
-        if (!novaCategoriaId) return;
-        const res = await request(app).put(`/categorias/${novaCategoriaId}`).send({});
-        expect(res.statusCode).toEqual(400);
-    });
-
-    it('DELETE /categorias/:id - Deve remover categoria', async () => {
-        if (!novaCategoriaId) return;
-        const res = await request(app).delete(`/categorias/${novaCategoriaId}`);
-        expect(res.statusCode).toEqual(204);
-    });
-
-    it('DELETE /categorias/:id - Deve retornar 404 para remoção de categoria inexistente', async () => {
-        const fakeId = "693afda0f6437add7f9646c9";
-        const res = await request(app).delete(`/categorias/${fakeId}`);
-        expect(res.statusCode).toEqual(404);
-    });
 });

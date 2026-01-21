@@ -1,162 +1,244 @@
-const Produto = require('../model/Produto');
-const mongodb = require('mongodb');
-jest.mock('mongodb');
+const ProdutoController = require('../controller/ProdutoController');
+const ProdutoService = require('../services/ProdutoService');
 
-describe('Produto', () => {
+jest.mock('../services/ProdutoService');
 
-  let mockClient;
-  let mockDbInstance;
-  let mockCollection;
+describe('ProdutoController Unit Tests', () => {
+  let req, res;
 
-  // -----------------------------
-  // MOCK DO BANCO
-  // -----------------------------
-  beforeAll(() => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    req = {
+      body: {},
+      params: {}
+    };
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn()
+    };
+  });
 
-    mockCollection = {
-      find: jest.fn().mockReturnValue({
-        toArray: jest.fn().mockResolvedValue([
-          { nome: 'Produto A', descricao: 'Descrição A', preco: 100 }
-        ]),
-      }),
-      insertOne: jest.fn().mockResolvedValue({
-        ops: [{ nome: 'Produto B', descricao: 'Descrição B', preco: 200 }],
-      }),
-      findOne: jest.fn().mockResolvedValue({
+  describe('listarProdutos', () => {
+    it('deve retornar lista de produtos e status 200', async () => {
+      const mockProdutos = [{ _id: '1', nome: 'Produto A' }];
+      ProdutoService.listarProdutos.mockResolvedValue(mockProdutos);
+
+      await ProdutoController.listarProdutos(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(mockProdutos);
+      expect(ProdutoService.listarProdutos).toHaveBeenCalledTimes(1);
+    });
+
+    it('deve retornar status 500 em erro', async () => {
+      ProdutoService.listarProdutos.mockRejectedValue(new Error('Erro'));
+
+      await ProdutoController.listarProdutos(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Erro ao listar produtos' });
+    });
+  });
+
+  describe('criarProduto', () => {
+    it('deve criar produto e retornar status 201', async () => {
+      req.body = {
         nome: 'Produto B',
-        descricao: 'Descrição B',
-        preco: 200
-      }),
-      updateOne: jest.fn().mockResolvedValue({ modifiedCount: 1 }),
-      deleteOne: jest.fn().mockResolvedValue({ deletedCount: 1 }),
-    };
+        id_categoria: 'cat1',
+        preco: 100,
+        descricao: 'Desc B'
+      };
+      const mockResultado = {
+        produtoCriado: { _id: '2', ...req.body },
+        estoqueCriado: { _id: 'est1' }
+      };
+      ProdutoService.criarProduto.mockResolvedValue(mockResultado);
 
-    mockDbInstance = {
-      collection: jest.fn().mockReturnValue(mockCollection)
-    };
+      await ProdutoController.criarProduto(req, res);
 
-    mockClient = {
-      db: jest.fn().mockReturnValue(mockDbInstance)
-    };
+      expect(ProdutoService.criarProduto).toHaveBeenCalledWith(
+        'Produto B', 'cat1', 100, 'Desc B'
+      );
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith(mockResultado.produtoCriado);
+    });
 
-    mongodb.MongoClient.connect.mockResolvedValue(mockClient);
+    it('deve retornar 400 se campos obrigatórios faltarem', async () => {
+      req.body = { nome: 'Incompleto' };
+
+      await ProdutoController.criarProduto(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Todos os campos devem ser preenchidos' });
+      expect(ProdutoService.criarProduto).not.toHaveBeenCalled();
+    });
+
+    it('deve retornar 400 se tipos de dados inválidos', async () => {
+      req.body = {
+        nome: 123,
+        id_categoria: 'cat1',
+        preco: 100,
+        descricao: 'Desc'
+      };
+
+      await ProdutoController.criarProduto(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringMatching(/Nome deve ser uma string/) }));
+    });
+
+    it('deve retornar 400 se serviço retornar falha na criação', async () => {
+      req.body = {
+        nome: 'Produto B',
+        id_categoria: 'cat1',
+        preco: 100,
+        descricao: 'Desc B'
+      };
+      ProdutoService.criarProduto.mockResolvedValue(null);
+
+      await ProdutoController.criarProduto(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Erro ao criar produto' });
+    });
+
+    it('deve retornar 500 em erro de exceção', async () => {
+      req.body = {
+        nome: 'Produto B',
+        id_categoria: 'cat1',
+        preco: 100,
+        descricao: 'Desc B'
+      };
+      ProdutoService.criarProduto.mockRejectedValue(new Error('Erro DB'));
+
+      await ProdutoController.criarProduto(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(500);
+    });
   });
 
-  // =============================================================
-  // CRIAÇÃO
-  // =============================================================
-  describe('Criar Produto', () => {
+  describe('obterProduto', () => {
+    it('deve retornar produto e status 200', async () => {
+      req.params = { id: '1' };
+      const mockProduto = { _id: '1', nome: 'A' };
+      ProdutoService.obterProduto.mockResolvedValue(mockProduto);
 
-    it('deve criar um produto com sucesso', async () => {
-      const novoProduto = new Produto('Produto B', 'Descrição B', 200);
-      const produtoCriado = await Produto.criarProduto(novoProduto);
+      await ProdutoController.obterProduto(req, res);
 
-      expect(produtoCriado.nome).toBe('Produto B');
-      expect(produtoCriado.descricao).toBe('Descrição B');
-      expect(produtoCriado.preco).toBe(200);
+      expect(ProdutoService.obterProduto).toHaveBeenCalledWith('1');
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(mockProduto);
     });
 
-    describe('Falhas ao criar', () => {
-      it('deve falhar ao criar produto com nome inválido', () => {
-        expect(() => new Produto(8, 'Descrição B', 200)).toThrow();
-      });
+    it('deve retornar 500 se erro', async () => {
+      req.params = { id: '1' };
+      ProdutoService.obterProduto.mockRejectedValue(new Error('Erro'));
 
-      it('deve falhar ao criar produto com descrição inválida', () => {
-        expect(() => new Produto('Produto B', 9, 200)).toThrow();
-      });
+      await ProdutoController.obterProduto(req, res);
 
-      it('deve falhar ao criar produto com preço inválido', () => {
-        expect(() => new Produto('Produto B', 'Descrição B', -5)).toThrow();
-      });
+      expect(res.status).toHaveBeenCalledWith(500);
     });
-
   });
 
-  // =============================================================
-  // LISTAR
-  // =============================================================
-  describe('Listar Produtos', () => {
+  describe('atualizarProduto', () => {
+    it('deve atualizar e retornar 201', async () => {
+      req.params = { id: '1' };
+      req.body = {
+        nome: 'Novo Nome',
+        id_categoria: 'cat1',
+        preco: 150,
+        descricao: 'Desc Nova'
+      };
+      const mockAtualizado = { ...req.body, _id: '1' };
+      ProdutoService.atualizarProduto.mockResolvedValue(mockAtualizado);
 
-    it('deve listar produtos com sucesso', async () => {
-      const produtos = await Produto.listarProdutos();
+      await ProdutoController.atualizarProduto(req, res);
 
-      expect(produtos).toHaveLength(1);
-      expect(produtos[0].nome).toBe('Produto A');
+      expect(ProdutoService.atualizarProduto).toHaveBeenCalledWith('1', req.body);
+      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.json).toHaveBeenCalledWith(mockAtualizado);
     });
 
-    it('deve falhar se o banco retornar erro ao listar', async () => {
-      mockCollection.find().toArray.mockRejectedValueOnce(new Error("Erro ao listar"));
-      await expect(Produto.listarProdutos())
-        .rejects
-        .toThrow("Erro ao listar");
+    it('deve retornar 400 se ID não fornecido no params', async () => {
+      req.params = {};
+      req.body = { nome: 'A', id_categoria: 'c', preco: 1, descricao: 'd' };
+
+      await ProdutoController.atualizarProduto(req, res);
+      expect(res.status).toHaveBeenCalledWith(400);
     });
 
+    it('deve retornar 404 se produto não encontrado', async () => {
+      req.params = { id: '999' };
+      req.body = {
+        nome: 'Novo',
+        id_categoria: 'cat1',
+        preco: 150,
+        descricao: 'Desc'
+      };
+      ProdutoService.atualizarProduto.mockResolvedValue(null);
+
+      await ProdutoController.atualizarProduto(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Produto não encontrado' });
+    });
   });
 
-  // =============================================================
-  // OBTER
-  // =============================================================
-  describe('Obter Produto', () => {
+  describe('deletarProduto', () => {
+    it('deve deletar e retornar 200', async () => {
+      req.params = { id: '1' };
+      ProdutoService.deletarProduto.mockResolvedValue(true);
 
-    it('deve obter um produto com sucesso', async () => {
-      const produto = await Produto.obterProduto('1');
+      await ProdutoController.deletarProduto(req, res);
 
-      expect(produto.nome).toBe('Produto B');
-      expect(produto.descricao).toBe('Descrição B');
+      expect(ProdutoService.deletarProduto).toHaveBeenCalledWith('1');
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Produto deletado com sucesso' });
     });
 
-    it('deve falhar ao tentar obter com ID inválido (ObjectId)', async () => {
-      await expect(Produto.obterProduto('id inválido')).rejects.toThrow();
+    it('deve retornar 404 se não encontrado', async () => {
+      req.params = { id: '999' };
+      ProdutoService.deletarProduto.mockResolvedValue(null);
+
+      await ProdutoController.deletarProduto(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith({ message: 'Produto não encontrado' });
     });
 
+    it('deve retornar 400 se ID invalido', async () => {
+      req.params = {};
+      await ProdutoController.deletarProduto(req, res);
+      expect(res.status).toHaveBeenCalledWith(400);
+    });
   });
 
-  // =============================================================
-  // ATUALIZAR
-  // =============================================================
-  describe('Atualizar Produto', () => {
+  describe('obterProdutosPorCategoria', () => {
+    it('deve retornar produtos e status 200', async () => {
+      req.params = { id_categoria: 'cat1' };
+      const mockProdutos = [{ nome: 'ProdCat1' }];
+      ProdutoService.obterProdutosPorCategoria.mockResolvedValue(mockProdutos);
 
-    it('deve atualizar um produto com sucesso', async () => {
-      const produtoAtualizado = await Produto.atualizarProduto('1', {
-        nome: 'Produto Atualizado',
-        descricao: 'Descrição Atualizada',
-        preco: 300,
-      });
-      expect(produtoAtualizado.modifiedCount).toBe(1);
+      await ProdutoController.obterProdutosPorCategoria(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(mockProdutos);
     });
 
-    it('deve falhar ao atualizar um produto inexistente', async () => {
-      mockCollection.updateOne.mockResolvedValueOnce({ modifiedCount: 0 });
-      const resp = await Produto.atualizarProduto('1', {
-        nome: 'Teste',
-        descricao: 'Teste',
-        preco: 10,
-      });
+    it('deve retornar 404 se não encontrar produtos ou categoria', async () => {
+      req.params = { id_categoria: 'catVazia' };
+      ProdutoService.obterProdutosPorCategoria.mockResolvedValue(null);
 
-      expect(resp.modifiedCount).toBe(0);
+      await ProdutoController.obterProdutosPorCategoria(req, res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
     });
 
-  });
-
-  // =============================================================
-  // DELETAR
-  // =============================================================
-  describe('Deletar Produto', () => {
-
-    it('deve deletar um produto com sucesso', async () => {
-      const deletado = await Produto.deletarProduto('1');
-      expect(deletado.deletedCount).toBe(1);
+    it('deve retornar 400 se id_categoria invalido', async () => {
+      req.params = {};
+      await ProdutoController.obterProdutosPorCategoria(req, res);
+      expect(res.status).toHaveBeenCalledWith(400);
     });
-
-    it('deve falhar ao tentar deletar produto inexistente', async () => {
-
-      mockCollection.deleteOne.mockResolvedValueOnce({ deletedCount: 0 });
-
-      const resp = await Produto.deletarProduto('1');
-
-      expect(resp.deletedCount).toBe(0);
-    });
-
   });
 
 });
