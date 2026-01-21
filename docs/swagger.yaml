@@ -10,147 +10,258 @@ servers:
     description: Servidor local
 
 tags:
-  - name: Produtos
   - name: Categorias
+  - name: Produtos
   - name: Estoques
   - name: Vendas
 
 paths:
-
   /produtos:
     get:
-      tags: [Produtos]
       summary: Lista todos os produtos
+      tags:
+        - Produtos
       responses:
-        '200':
-          description: Lista de produtos retornada
+        200:
+          description: Lista de produtos encontrada
           content:
             application/json:
               example:
-                - __id: "693afda0f6437add7f9646p1"
-                  nome: "Arroz 5kg"
-                  id_categoria: "693afda0f6437add7f9646c1"
-                  preco: 24.90
-                  descricao: "Arroz tipo 1"
-                - _id: "693afda0f6437add7f9646p2"
-                  nome: "Feijão Preto"
-                  id_categoria: "693afda0f6437add7f9646c1"
-                  preco: 8.50
-                  descricao: "Feijão selecionado"
+                - _id: "696fff989f52fcff60fce2c1"
+                  nome: "Arroz"
+                  id_categoria: "696fff509f52fcff60fce2c0"
+                  preco: 22.5
+                  descricao: "Arroz Rei Arthur"
+                - _id: "69703199cda9b80a7699f616"
+                  nome: "Macarrão"
+                  id_categoria: "696fff509f52fcff60fce2c0"
+                  preco: 4.5
+                  descricao: "Macarrão espaguete"
+        404:
+          description: Nenhum produto encontrado
+          content:
+            application/json:
+              example:
+                mensagem: "Nenhum produto encontrado"
+        500:
+          description: Erro ao listar produtos
+          content:
+            application/json:
+              example:
+                erro: "Erro ao listar produtos -> erro interno"
 
     post:
-      tags: [Produtos]
-      summary: Cadastra um novo produto
+      summary: Cria um novo produto
+      tags:
+        - Produtos
       requestBody:
         required: true
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/Produto'
             example:
               nome: "Macarrão"
-              id_categoria: "693afda0f6437add7f9646c2"
-              preco: 4.50
+              id_categoria: "696fff509f52fcff60fce2c0"
+              preco: 4.5
               descricao: "Macarrão espaguete"
       responses:
-        '201':
-          description: Produto criado
+        201:
+          description: Produto criado com sucesso
           content:
             application/json:
               example:
-                _id: "693afda0f6437add7f9646p3"
+                _id: "69703199cda9b80a7699f616"
                 nome: "Macarrão"
-                id_categoria: "693afda0f6437add7f9646c2"
-                preco: 4.50
+                id_categoria: "696fff509f52fcff60fce2c0"
+                preco: 4.5
                 descricao: "Macarrão espaguete"
+        400:
+          description: Erro de validação
+          content:
+            application/json:
+              example:
+                mensagem: "Todos os campos devem ser preenchidos"
+        500:
+          description: Erro ao criar produto
+          content:
+            application/json:
+              example:
+                erro: "Erro ao criar produto -> erro interno"
 
   /produtos/{id}:
     get:
-      tags: [Produtos]
-      summary: Busca produto pelo ID
+      summary: Obtém um produto pelo ID
+      tags:
+        - Produtos
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
+          example: "69703199cda9b80a7699f616"
       responses:
-        '200':
+        200:
           description: Produto encontrado
           content:
             application/json:
               example:
-                _id: "693afda0f6437add7f9646p1"
-                nome: "Arroz 5kg"
-                id_categoria: "693afda0f6437add7f9646c1"
-                preco: 24.90
-                descricao: "Arroz tipo 1"
-        '404':
+                _id: "69703199cda9b80a7699f616"
+                nome: "Macarrão"
+                id_categoria: "696fff509f52fcff60fce2c0"
+                preco: 4.5
+                descricao: "Macarrão espaguete"
+        400:
+          description: ID inválido
+          content:
+            application/json:
+              example:
+                mensagem: "ID inválido"
+        404:
           description: Produto não encontrado
+          content:
+            application/json:
+              example:
+                mensagem: "Produto não encontrado"
+        500:
+          description: Erro ao obter produto
+          content:
+            application/json:
+              example:
+                erro: "Erro ao obter produto -> erro interno"
 
     put:
-      tags: [Produtos]
-      summary: Atualiza um produto
+      summary: Atualiza um produto pelo ID
+      tags:
+        - Produtos
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
+          example: "69703199cda9b80a7699f616"
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/Produto' }
             example:
-              nome: "Arroz Premium 5kg"
-              id_categoria: "693afda0f6437add7f9646c1"
-              preco: 29.90
-              descricao: "Arroz melhorado"
+              nome: "Macarrão"
+              id_categoria: "696fff509f52fcff60fce2c0"
+              preco: 6.5
+              descricao: "Macarrão espaguete"
       responses:
-        '200':
-          description: Produto atualizado
+        201:
+          description: Produto atualizado com sucesso
           content:
             application/json:
               example:
-                _id: "693afda0f6437add7f9646p1"
-                nome: "Arroz Premium 5kg"
-                id_categoria: "693afda0f6437add7f9646c1"
-                preco: 29.90
+                _id: "69703199cda9b80a7699f616"
+                nome: "Macarrão"
+                id_categoria: "696fff509f52fcff60fce2c0"
+                preco: 6.5
+                descricao: "Macarrão espaguete"
+        400:
+          description: Erro de validação ou ID inválido
+          content:
+            application/json:
+              example:
+                mensagem: "Todos os campos devem ser preenchidos"
+        404:
+          description: Produto não encontrado
+          content:
+            application/json:
+              example:
+                mensagem: "Produto não encontrado"
+        500:
+          description: Erro ao atualizar produto
+          content:
+            application/json:
+              example:
+                erro: "Erro ao atualizar produto -> erro interno"
 
     delete:
-      tags: [Produtos]
-      summary: Remove produto
+      summary: Deleta um produto pelo ID
+      tags:
+        - Produtos
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
+          example: "69703199cda9b80a7699f616"
       responses:
-        '204':
-          description: Produto removido
+        200:
+          description: Produto deletado com sucesso
+          content:
+            application/json:
+              example:
+                message: "Produto deletado com sucesso"
+        400:
+          description: ID inválido
+          content:
+            application/json:
+              example:
+                mensagem: "ID inválido"
+        404:
+          description: Produto não encontrado
+          content:
+            application/json:
+              example:
+                mensagem: "Produto não encontrado"
+        500:
+          description: Erro ao deletar produto
+          content:
+            application/json:
+              example:
+                erro: "Erro ao deletar produto -> erro interno"
 
   /produtos/categoria/{id_categoria}:
     get:
-      tags: [Produtos]
-      summary: Lista produtos por categoria
+      summary: Lista produtos de uma categoria específica
+      tags:
+        - Produtos
       parameters:
         - in: path
           name: id_categoria
           required: true
           schema:
             type: string
+          example: "696fff509f52fcff60fce2c0"
       responses:
-        '200':
-          description: Lista retornada
+        200:
+          description: Produtos encontrados
           content:
             application/json:
               example:
-                - _id: "693afda0f6437add7f9646p1"
-                  nome: "Arroz 5kg"
-                  id_categoria: "693afda0f6437add7f9646c1"
-                  preco: 24.90
+                - _id: "696fff989f52fcff60fce2c1"
+                  nome: "Arroz"
+                  id_categoria: "696fff509f52fcff60fce2c0"
+                  preco: 22.5
+                  descricao: "Arroz Rei Arthur"
+                - _id: "697032d5cda9b80a7699f618"
+                  nome: "Macarrão"
+                  id_categoria: "696fff509f52fcff60fce2c0"
+                  preco: 4.5
+                  descricao: "Macarrão espaguete"
+        400:
+          description: ID da categoria inválido
+          content:
+            application/json:
+              example:
+                mensagem: "ID da categoria inválido"
+        404:
+          description: Nenhum produto encontrado para a categoria
+          content:
+            application/json:
+              example:
+                mensagem: "Nenhum produto encontrado para a categoria"
+        500:
+          description: Erro ao listar produtos
+          content:
+            application/json:
+              example:
+                erro: "Erro ao listar produtos -> erro interno"
 
   /categorias:
     get:
@@ -158,15 +269,25 @@ paths:
       summary: Lista categorias
       responses:
         '200':
-          description: Categorias retornadas
+          description: Lista de categorias ou mensagem de vazio
+          content:
+            application/json:
+              examples:
+                vazio:
+                  value:
+                    mensagem: "Nenhuma categoria cadastrada"
+                lista:
+                  value:
+                    - _id: "696ff84e05c8c64eee6cd1df"
+                      nome: "Bebidas"
+                    - _id: "696ff85405c8c64eee6cd1e0"
+                      nome: "Grãos"
+        500:
+          description: Erro ao listar categorias
           content:
             application/json:
               example:
-                - _id: "693afda0f6437add7f9646c1"
-                  nome: "Alimentos"
-                - _id: "693afda0f6437add7f9646c2"
-                  nome: "Higiene"
-
+                erro: "Erro ao listar categorias -> erro interno"
     post:
       tags: [Categorias]
       summary: Cria categoria
@@ -174,36 +295,65 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/Categoria' }
+            schema:
+              type: object
+              properties:
+                nome:
+                  type: string
+              required: [nome]
             example:
-              nome: "Bebidas"
+              nome: "Grãos"
       responses:
         '201':
           description: Categoria criada
           content:
             application/json:
               example:
-                _id: "693afda0f6437add7f9646c3"
-                nome: "Bebidas"
-
+                _id: "696ff85405c8c64eee6cd1e0"
+                nome: "Grãos"
+        '400':
+          description: Erro de validação
+          content:
+            application/json:
+              example:
+                erro: "Campo 'nome' é obrigatório e deve ser uma string"
+        500:
+          description: Erro ao criar categoria
+          content:
+            application/json:
+              example:
+                erro: "Erro ao criar categoria -> erro interno" 
   /categorias/{id}:
     get:
       tags: [Categorias]
-      summary: Busca categoria
+      summary: Busca categoria por ID
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
+          example: "696fff509f52fcff60fce2c0"
       responses:
         '200':
           description: Categoria encontrada
           content:
             application/json:
               example:
-                _id: "693afda0f6437add7f9646c1"
-                nome: "Alimentos"
+                _id: "696ff84e05c8c64eee6cd1df"
+                nome: "Bebidas"
+        '404':
+          description: Categoria não encontrada
+          content:
+            application/json:
+              example:
+                mensagem: "Categoria não encontrada"
+        500:
+          description: Erro ao buscar categoria
+          content:
+            application/json:
+              example:
+                erro: "Erro ao buscar categoria -> erro interno"
 
     put:
       tags: [Categorias]
@@ -214,16 +364,45 @@ paths:
           required: true
           schema:
             type: string
+          example: "696fff509f52fcff60fce2c0"
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/Categoria' }
+            schema:
+              type: object
+              properties:
+                nome:
+                  type: string
+              required: [nome]
             example:
-              nome: "Alimentos Secos"
+              nome: "Grãos"
       responses:
         '200':
           description: Categoria atualizada
+          content:
+            application/json:
+              example:
+                _id: "696ff6a905c8c64eee6cd1de"
+                nome: "Grãos"
+        '400':
+          description: Erro de validação
+          content:
+            application/json:
+              example:
+                erro: "Campo 'nome' e 'id' são obrigatórios e 'nome' deve ser uma string"
+        '404':
+          description: Categoria não encontrada
+          content:
+            application/json:
+              example:
+                mensagem: "Categoria não encontrada"
+        500:
+          description: Erro ao atualizar categoria
+          content:
+            application/json:
+              example:
+                erro: "Erro ao atualizar categoria -> erro interno"
 
     delete:
       tags: [Categorias]
@@ -234,253 +413,379 @@ paths:
           required: true
           schema:
             type: string
+          example: "696fff509f52fcff60fce2c0"
       responses:
-        '204':
+        '200':
           description: Categoria removida
+          content:
+            application/json:
+              example:
+                mensagem: "Categoria removida com sucesso"
+        '404':
+          description: Categoria não encontrada
+          content:
+            application/json:
+              example:
+                mensagem: "Categoria não encontrada"
+        500:
+          description: Erro ao remover categoria
+          content:
+            application/json:
+              example:
+                erro: "Erro ao remover categoria -> erro interno"
   /estoques:
     get:
       tags: [Estoques]
-      summary: Lista estoques de todos os produtos
+      summary: Lista todos os estoques
       responses:
         '200':
-          description: Estoques retornados
+          description: Lista de estoques ou mensagem de vazio
+          content:
+            application/json:
+              examples:
+                vazio:
+                  value:
+                    mensagem: "Nenhum estoque cadastrado"
+                lista:
+                  value:
+                    - _id: "696ef3581781c8232b84ffa0"
+                      id_produto: "696ef3581781c8232b84ff9f"
+                      quantidade: 95
+                    - _id: "696ef494503922700f59db59"
+                      id_produto: "696ef494503922700f59db58"
+                      quantidade: 95
+                    - _id: "696ef497503922700f59db5b"
+                      id_produto: "696ef497503922700f59db5a"
+                      quantidade: 98
+        500:
+          description: Erro ao listar estoques
           content:
             application/json:
               example:
-                - id_produto: "693afda0f6437add7f9646p1"
-                  quantidade: 150
-                - id_produto: "693afda0f6437add7f9646p2"
-                  quantidade: 44
+                erro: "Erro ao listar estoques -> erro interno"
 
-  /estoques/{id_produto}:
+  /estoques/{id}:
     get:
       tags: [Estoques]
-      summary: Consulta estoques de um produto
+      summary: Busca estoque pelo ID do produto
       parameters:
         - in: path
-          name: id_produto
+          name: id
           required: true
           schema:
             type: string
+          example: "696fff989f52fcff60fce2c1"
       responses:
         '200':
-          description: Estoques encontrados
+          description: Estoque encontrado
           content:
             application/json:
               example:
-                id_produto: "693afda0f6437add7f9646p1"
-                quantidade: 150
+                _id: "696fff989f52fcff60fce2c2"
+                id_produto: "696fff989f52fcff60fce2c1"
+                quantidade: 0
+        '400':
+          description: Dados inválidos
+          content:
+            application/json:
+              example:
+                mensagem: "Dados inválidos"
+        '404':
+          description: Estoque não encontrado
+          content:
+            application/json:
+              example:
+                mensagem: "Estoque não encontrado"
+        500:
+          description: Erro ao obter estoque
+          content:
+            application/json:
+              example:
+                erro: "Erro ao obter estoque -> erro interno"
 
   /estoques/movimentar:
     post:
       tags: [Estoques]
-      summary: Movimenta estoques
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/Movimentoestoques' }
-            example:
-              id_produto: "693afda0f6437add7f9646p1"
-              tipo: "entrada"
-              quantidade: 20
-      responses:
-        '200':
-          description: Movimento registrado
-          content:
-            application/json:
-              example:
-                _id: "693afda0f6437add7f9646m1"
-                id_produto: "693afda0f6437add7f9646p1"
-                quantidade: 20
-  /vendas:
-    get:
-      tags: [Vendas]
-      summary: Lista vendas realizadas
-      responses:
-        '200':
-          description: Lista de vendas
-          content:
-            application/json:
-              example:
-                - _id: "693afda0f6437add7f9646v1"
-                  data: "2025-01-20"
-                  total: 120.50
-                  itens:
-                    - id_produto: "693afda0f6437add7f964612"
-                      quantidade: 2
-                      precoUnitario: 24.90
-
-    post:
-      tags: [Vendas]
-      summary: Registra nova venda
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/Venda' }
-            example:
-              itens:
-                - id_produto: "696ef3581781c8232b84ff9f"
-                  quantidade: 1
-                - id_produto: "696ef497503922700f59db5a"
-                  quantidade: 2
-      responses:
-        '201':
-          description: Venda registrada
-          content:
-            application/json:
-              example:
-                  "_id": "696fd309641409858f11fcc3"
-                  "data": "2026-01-20T19:10:01.545Z"
-                  "total": 16
-                  "itens":
-                       - "id_produto": "696ef3581781c8232b84ff9f"
-                         "quantidade": 1
-                         "preco_unitario": 6
-                       - "id_produto": "696ef497503922700f59db5a"
-                         "quantidade": 2
-                         "preco_unitario": 5
-  /vendas/{id}:
-    get:
-      tags: [Vendas]
-      summary: Busca venda pelo ID
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Venda retornada
-          content:
-            application/json:
-              example:
-                _id: "v1"
-                total: 120.50
-                data: "2025-01-20"
-                itens:
-                  - id_produto: "693afda0f6437add7f964613"
-                    quantidade: 2
-                    precoUnitario: 24.90
-        '404':
-          description: Venda não encontrada
-
-    put:
-      tags: [Vendas]
-      summary: Atualiza venda
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      summary: Movimenta o estoque (entrada ou saída)
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [itens]
               properties:
-                itens:
-                  type: array
-                  minItems: 1
-                  items:
-                    type: object
-                    required: [id_produto, quantidade]
-                    properties:
-                      id_produto:
-                        type: string
-                      quantidade:
-                        type: number
-                        minimum: 1
+                id_produto:
+                  type: string
+                tipo:
+                  type: string
+                  enum: [entrada, saida]
+                quantidade:
+                  type: integer
+              required: [id_produto, tipo, quantidade]
             example:
-              itens:
-                - id_produto: "696ef3581781c8232b84ff9f"
-                  quantidade: 1
-                - id_produto: "696ef497503922700f59db5a"
-                  quantidade: 2
+              id_produto: "696fff989f52fcff60fce2c1"
+              tipo: "entrada"
+              quantidade: 20
       responses:
         '200':
-          description: Venda atualizada com sucesso
+          description: Estoque atualizado
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  _id:
-                    type: string
-                  data:
-                    type: string
-                    format: date-time
-                  total:
-                    type: number
-                  itens:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        id_produto:
-                          type: string
-                        quantidade:
-                          type: number
-                        preco_unitario:
-                          type: number
               example:
-                _id: "696fd309641409858f11fcc3"
-                data: "2026-01-20T19:10:01.545Z"
-                total: 16
-                itens:
-                  - id_produto: "696ef3581781c8232b84ff9f"
-                    quantidade: 1
-                    preco_unitario: 6
-                  - id_produto: "696ef497503922700f59db5a"
-                    quantidade: 2
-                    preco_unitario: 5
+                _id: "696fff989f52fcff60fce2c2"
+                id_produto: "696fff989f52fcff60fce2c1"
+                quantidade: 20
         '400':
-          description: Erro de validação (ID ou itens inválidos)
+          description: Dados inválidos
+          content:
+            application/json:
+              examples:
+                faltando_campos:
+                  value:
+                    mensagem: "Dados inválidos"
+                tipo_invalido:
+                  value:
+                    mensagem: "Tipo inválido"
+                quantidade_invalida:
+                  value:
+                    mensagem: "Quantidade inválida"
         '404':
-          description: Venda não encontrada
-        '500':
-          description: Erro interno do servidor
+          description: Estoque não encontrado
+          content:
+            application/json:
+              example:
+                mensagem: "Estoque não encontrado"
+        500:
+          description: Erro ao movimentar estoque
+          content:
+            application/json:
+              example:
+                erro: "Erro ao movimentar estoque -> erro interno"
+  /vendas:
+    get:
+      summary: Lista vendas realizadas
+      tags:
+        - Vendas
+      responses:
+        200:
+          description: Lista de vendas encontrada
+          content:
+            application/json:
+              example:
+                - _id: "69704ce0a903940497ec2d07"
+                  data: "2026-01-21T03:49:52.049Z"
+                  total: 261
+                  itens:
+                    - id_produto: "696fff989f52fcff60fce2c1"
+                      quantidade: 10
+                      preco_unitario: 22.5
+                    - id_produto: "697032d5cda9b80a7699f618"
+                      quantidade: 8
+                      preco_unitario: 4.5
+                - _id: "69704cfba903940497ec2d08"
+                  data: "2026-01-21T03:50:19.734Z"
+                  total: 76.5
+                  itens:
+                    - id_produto: "697032d5cda9b80a7699f618"
+                      quantidade: 2
+                      preco_unitario: 4.5
+                    - id_produto: "696fff989f52fcff60fce2c1"
+                      quantidade: 3
+                      preco_unitario: 22.5
+        404:
+          description: Nenhuma venda encontrada
+          content:
+            application/json:
+              example:
+                error: "Nenhuma venda encontrada"
+        500:
+          description: Erro ao listar vendas
+          content:
+            application/json:
+              example:
+                erro: "Erro ao listar vendas -> erro interno"
+    post:
+      summary: Registra nova venda
+      tags:
+        - Vendas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              itens:
+                - id_produto: "697032d5cda9b80a7699f618"
+                  quantidade: 2
+                - id_produto: "696fff989f52fcff60fce2c1"
+                  quantidade: 3
+      responses:
+        201:
+          description: Venda criada com sucesso
+          content:
+            application/json:
+              example:
+                _id: "69704d42a903940497ec2d09"
+                data: "2026-01-21T03:51:30.598Z"
+                total: 76.5
+                itens:
+                  - id_produto: "697032d5cda9b80a7699f618"
+                    quantidade: 2
+                    preco_unitario: 4.5
+                  - id_produto: "696fff989f52fcff60fce2c1"
+                    quantidade: 3
+                    preco_unitario: 22.5
+        400:
+          description: Erro de validação
+          content:
+            application/json:
+              example:
+                error: "Item inválido"
+        500:
+          description: Erro ao criar venda
+          content:
+            application/json:
+              example:
+                erro: "Erro ao criar venda -> erro interno"
 
-    delete:
-      tags: [Vendas]
-      summary: Remove venda
+  /vendas/{id}:
+    get:
+      summary: Busca venda pelo ID
+      tags:
+        - Vendas
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
+          example: "69704d42a903940497ec2d09"
       responses:
-        '200':
-          description: Venda deletada com sucesso
+        200:
+          description: Venda encontrada
           content:
             application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
               example:
-                message: "Venda deletada com sucesso"
-        '400':
+                _id: "69704d42a903940497ec2d09"
+                data: "2026-01-21T03:51:30.598Z"
+                total: 76.5
+                itens:
+                  - id_produto: "697032d5cda9b80a7699f618"
+                    quantidade: 2
+                    preco_unitario: 4.5
+                  - id_produto: "696fff989f52fcff60fce2c1"
+                    quantidade: 3
+                    preco_unitario: 22.5
+        400:
           description: ID não fornecido
           content:
             application/json:
               example:
                 error: "ID não fornecido"
-        '404':
+        404:
           description: Venda não encontrada
           content:
             application/json:
               example:
                 error: "Venda não encontrada"
-        '500':
-          description: Erro interno do servidor
+        500:
+          description: Erro ao obter venda
+          content:
+            application/json:
+              example:
+                erro: "Erro ao obter venda -> erro interno"
+
+    put:
+      summary: Atualiza venda
+      tags:
+        - Vendas
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: "69704d42a903940497ec2d09"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            example:
+              itens:
+                - id_produto: "697032d5cda9b80a7699f618"
+                  quantidade: 1
+                - id_produto: "696fff989f52fcff60fce2c1"
+                  quantidade: 1
+      responses:
+        200:
+          description: Venda atualizada com sucesso
+          content:
+            application/json:
+              example:
+                _id: "69704d42a903940497ec2d09"
+                data: "2026-01-21T03:53:06.971Z"
+                total: 27
+                itens:
+                  - id_produto: "697032d5cda9b80a7699f618"
+                    quantidade: 1
+                    preco_unitario: 4.5
+                  - id_produto: "696fff989f52fcff60fce2c1"
+                    quantidade: 1
+                    preco_unitario: 22.5
+        400:
+          description: Erro de validação
+          content:
+            application/json:
+              example:
+                error: "Quantidade inválida"
+        404:
+          description: Venda não encontrada
+          content:
+            application/json:
+              example:
+                error: "Venda não encontrada"
+        500:
+          description: Erro ao atualizar venda
+          content:
+            application/json:
+              example:
+                erro: "Erro ao atualizar venda -> erro interno"
+
+    delete:
+      summary: Remove venda
+      tags:
+        - Vendas
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: "69704d42a903940497ec2d09"
+      responses:
+        200:
+          description: Venda deletada com sucesso
+          content:
+            application/json:
+              example:
+                message: "Venda deletada com sucesso"
+        400:
+          description: ID não fornecido
+          content:
+            application/json:
+              example:
+                error: "ID não fornecido"
+        404:
+          description: Venda não encontrada
+          content:
+            application/json:
+              example:
+                error: "Venda não encontrada"
+        500:
+          description: Erro ao deletar venda
+          content:
+            application/json:
+              example:
+                erro: "Erro ao deletar venda -> erro interno"
 
 components:
   schemas:

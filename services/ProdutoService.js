@@ -14,16 +14,14 @@ exports.listarProdutos = async () => {
 exports.criarProduto = async (nome, id_categoria, preco, descricao) => {
     try {
         const categoria = await CategoriaService.buscarCategoriaPorId(id_categoria);
-        if (!categoria) return null;
+        if (!categoria) throw new Error("Categoria não encontrada");
         
         const produto = new Produto(nome, categoria._id, preco, descricao);
         const produtoCriado = await Produto.criarProduto(produto);
         const estoqueCriado = await EstoqueService.criarEstoque(produtoCriado._id);
-        if (estoqueCriado) {
-            return { produtoCriado, estoqueCriado };
-        }
+        if (estoqueCriado) return { produtoCriado, estoqueCriado };
         await Produto.deletarProduto(produtoCriado._id);
-        return null;
+        throw new Error("Erro ao criar estoque");
     } catch (error) {
         console.log(error);
         throw error;
@@ -43,7 +41,7 @@ exports.atualizarProduto = async (id, produto) => {
     try {
         const produtoExiste = await this.obterProduto(id);
         if (!produtoExiste) {
-            return null;
+            throw new Error("Produto não encontrado");
         }
         const produtoAtualizado = new Produto(produto.nome, produto.id_categoria, produto.preco, produto.descricao);
         return await Produto.atualizarProduto(id, produtoAtualizado);

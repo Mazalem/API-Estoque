@@ -3,12 +3,10 @@ const VendaService = require("../services/VendasService");
 exports.listarVendas = async (req, res) => {
     try {
         const vendas = await VendaService.listarVendas();
-        if (!vendas) {
-            return res.status(404).json({ error: "Vendas não encontradas" });
-        }
+        if (vendas.length === 0) return res.status(404).json({ error: "Nenhuma venda encontrada" });
         res.status(200).json(vendas);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ erro: "Erro ao listar vendas -> " + error.message });
     }
 };
 
@@ -35,7 +33,7 @@ exports.criarVenda = async (req, res) => {
         }
         res.status(201).json(venda);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ erro: "Erro ao criar venda -> " + error.message });
     }
 };
 
@@ -51,7 +49,7 @@ exports.obterVenda = async (req, res) => {
         }
         res.status(200).json(venda);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ erro: "Erro ao obter venda -> " + error.message });
     }
 };
 
@@ -82,7 +80,7 @@ exports.atualizarVenda = async (req, res) => {
         }
         res.status(200).json(venda);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ erro: "Erro ao atualizar venda -> " + error.message });
     }
 };
 
@@ -98,6 +96,6 @@ exports.deletarVenda = async (req, res) => {
         }
         res.status(200).json({ message: "Venda deletada com sucesso" });
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ erro: "Erro ao deletar venda -> " + error.message });
     }
 };

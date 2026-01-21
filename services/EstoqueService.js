@@ -55,7 +55,7 @@ exports.movimentarEstoque = async (id_produto, quantidade, tipo) => {
         if (tipo === "saida") {
             quantidade = -quantidade;
             if (estoqueExiste.quantidade + quantidade < 0) {
-                return null;
+                throw new Error("Estoque insuficiente");
             }
         }
         return await Estoque.movimentarEstoque(id_produto, quantidade);

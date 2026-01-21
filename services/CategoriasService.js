@@ -28,13 +28,13 @@ exports.buscarCategoriaPorId = async (id_categoria) => {
   }
 };
 
-exports.atualizarCategoria = async (id_categoria, categoria) => {
+exports.atualizarCategoria = async (id_categoria, nome) => {
   try {
     const categoriaExiste = await Categoria.buscarCategoriaPorId(id_categoria);
     if (!categoriaExiste) {
       return null;
     }
-    const categoriaAtualizada = new Categoria(categoria.nome);
+    const categoriaAtualizada = new Categoria(nome);
     return await Categoria.atualizarCategoria(id_categoria, categoriaAtualizada);
   } catch (error) {
     console.log(error);
